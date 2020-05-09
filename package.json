@@ -1,0 +1,16 @@
+{
+  "name": "primtech-client",
+  "version": "1.0.0",
+  "description": "The fancy client",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "chriscooper",
+  "license": "ISC",
+  "dependencies": {
+    "@vue/cli": "^4.3.1",
+    "grpc": "^1.24.2",
+    "vuex": "^3.3.0"
+  }
+}
