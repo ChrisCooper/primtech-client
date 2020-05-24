@@ -48,14 +48,14 @@
     },
     "extends": [
       "plugin:vue/essential",
-      "@vue/airbnb",
       "@vue/typescript/recommended"
     ],
     "parserOptions": {
-      "ecmaVersion": 2020
+      "ecmaVersion": 2020,
+      "sourceType": "module"
     },
     "rules": {},
-
+    "ignorePatterns": ["src/proto/*"],
     "overrides": [
       {
         "files": [
