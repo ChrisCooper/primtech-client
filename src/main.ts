@@ -5,7 +5,7 @@ import App from './App.vue';
 import store from './store';
 
 import {Citizen, Void} from './proto/citizen_pb';
-import {CitizenServiceClient} from './proto/citizen_grpc_pb';
+import {CitizenServiceClient} from './proto/citizen_grpc_web_pb';
 
 import { credentials, ServiceError } from 'grpc';
 
@@ -18,7 +18,7 @@ new Vue({
 
 
 const channelCredentials = credentials.createInsecure();
-const citizenClient = new CitizenServiceClient('http://localhost:8080', channelCredentials, {});
+const citizenClient = new CitizenServiceClient('http://localhost:8080');
 
 const clientCitizen = new Citizen();
 clientCitizen.setId(55);
@@ -26,7 +26,7 @@ clientCitizen.setName("ClientyCitizen");
 
 const request = new Void();
 
-var call = citizenClient.getCitizen(request, (err: ServiceError | null, response: Citizen) => {
+const call = citizenClient.getCitizen(request, undefined,  (err: grpcWeb.Error, response: Citizen) => {
   if (err){
     console.log(err.code);
     console.log(err.message);
