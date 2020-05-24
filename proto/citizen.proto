@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package primtech;
+
+message Void {}
+
+message Citizen {
+    int32 id = 1;
+    string name = 2;
+}
+
+service CitizenService {
+    rpc GetCitizen(Void) returns (Citizen) {};
+//    rpc AddSongs(stream Song) returns (google.protobuf.Empty) {};
+//    rpc GetChat(Song) returns (stream Comment) {};
+//    rpc LiveChat(stream Comment) returns (stream Comment) {};
+}

@@ -3,6 +3,8 @@
 PROTO_DEST=./src/proto
 mkdir -p ${PROTO_DEST}
 
+rm ${PROTO_DEST}/*
+
 # JavaScript code generation
 ./node_modules/.bin/grpc_tools_node_protoc \
     --js_out=import_style=commonjs,binary:${PROTO_DEST} \
@@ -17,3 +19,4 @@ mkdir -p ${PROTO_DEST}
     --ts_out=${PROTO_DEST} \
     -I ./proto \
     proto/*.proto
+
