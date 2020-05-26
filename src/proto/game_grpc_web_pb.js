@@ -1,5 +1,5 @@
 /**
- * @fileoverview gRPC-Web generated client stub for primtech.citizen
+ * @fileoverview gRPC-Web generated client stub for primtech.game
  * @enhanceable
  * @public
  */
@@ -15,7 +15,7 @@ grpc.web = require('grpc-web');
 var general_pb = require('./general_pb.js')
 const proto = {};
 proto.primtech = {};
-proto.primtech.citizen = require('./citizen_pb.js');
+proto.primtech.game = require('./game_pb.js');
 
 /**
  * @param {string} hostname
@@ -25,7 +25,7 @@ proto.primtech.citizen = require('./citizen_pb.js');
  * @struct
  * @final
  */
-proto.primtech.citizen.CitizenServiceClient =
+proto.primtech.game.GameServiceClient =
     function(hostname, credentials, options) {
   if (!options) options = {};
   options['format'] = 'text';
@@ -51,7 +51,7 @@ proto.primtech.citizen.CitizenServiceClient =
  * @struct
  * @final
  */
-proto.primtech.citizen.CitizenServicePromiseClient =
+proto.primtech.game.GameServicePromiseClient =
     function(hostname, credentials, options) {
   if (!options) options = {};
   options['format'] = 'text';
@@ -73,13 +73,13 @@ proto.primtech.citizen.CitizenServicePromiseClient =
  * @const
  * @type {!grpc.web.MethodDescriptor<
  *   !proto.primtech.Void,
- *   !proto.primtech.citizen.Citizen>}
+ *   !proto.primtech.game.FrameInfo>}
  */
-const methodDescriptor_CitizenService_GetCitizen = new grpc.web.MethodDescriptor(
-  '/primtech.citizen.CitizenService/GetCitizen',
-  grpc.web.MethodType.UNARY,
+const methodDescriptor_GameService_StreamFrames = new grpc.web.MethodDescriptor(
+  '/primtech.game.GameService/StreamFrames',
+  grpc.web.MethodType.SERVER_STREAMING,
   general_pb.Void,
-  proto.primtech.citizen.Citizen,
+  proto.primtech.game.FrameInfo,
   /**
    * @param {!proto.primtech.Void} request
    * @return {!Uint8Array}
@@ -87,7 +87,7 @@ const methodDescriptor_CitizenService_GetCitizen = new grpc.web.MethodDescriptor
   function(request) {
     return request.serializeBinary();
   },
-  proto.primtech.citizen.Citizen.deserializeBinary
+  proto.primtech.game.FrameInfo.deserializeBinary
 );
 
 
@@ -95,10 +95,10 @@ const methodDescriptor_CitizenService_GetCitizen = new grpc.web.MethodDescriptor
  * @const
  * @type {!grpc.web.AbstractClientBase.MethodInfo<
  *   !proto.primtech.Void,
- *   !proto.primtech.citizen.Citizen>}
+ *   !proto.primtech.game.FrameInfo>}
  */
-const methodInfo_CitizenService_GetCitizen = new grpc.web.AbstractClientBase.MethodInfo(
-  proto.primtech.citizen.Citizen,
+const methodInfo_GameService_StreamFrames = new grpc.web.AbstractClientBase.MethodInfo(
+  proto.primtech.game.FrameInfo,
   /**
    * @param {!proto.primtech.Void} request
    * @return {!Uint8Array}
@@ -106,48 +106,43 @@ const methodInfo_CitizenService_GetCitizen = new grpc.web.AbstractClientBase.Met
   function(request) {
     return request.serializeBinary();
   },
-  proto.primtech.citizen.Citizen.deserializeBinary
+  proto.primtech.game.FrameInfo.deserializeBinary
 );
 
 
 /**
- * @param {!proto.primtech.Void} request The
- *     request proto
+ * @param {!proto.primtech.Void} request The request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @param {function(?grpc.web.Error, ?proto.primtech.citizen.Citizen)}
- *     callback The callback function(error, response)
- * @return {!grpc.web.ClientReadableStream<!proto.primtech.citizen.Citizen>|undefined}
+ * @return {!grpc.web.ClientReadableStream<!proto.primtech.game.FrameInfo>}
  *     The XHR Node Readable Stream
  */
-proto.primtech.citizen.CitizenServiceClient.prototype.getCitizen =
-    function(request, metadata, callback) {
-  return this.client_.rpcCall(this.hostname_ +
-      '/primtech.citizen.CitizenService/GetCitizen',
+proto.primtech.game.GameServiceClient.prototype.streamFrames =
+    function(request, metadata) {
+  return this.client_.serverStreaming(this.hostname_ +
+      '/primtech.game.GameService/StreamFrames',
       request,
       metadata || {},
-      methodDescriptor_CitizenService_GetCitizen,
-      callback);
+      methodDescriptor_GameService_StreamFrames);
 };
 
 
 /**
- * @param {!proto.primtech.Void} request The
- *     request proto
+ * @param {!proto.primtech.Void} request The request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @return {!Promise<!proto.primtech.citizen.Citizen>}
- *     A native promise that resolves to the response
+ * @return {!grpc.web.ClientReadableStream<!proto.primtech.game.FrameInfo>}
+ *     The XHR Node Readable Stream
  */
-proto.primtech.citizen.CitizenServicePromiseClient.prototype.getCitizen =
+proto.primtech.game.GameServicePromiseClient.prototype.streamFrames =
     function(request, metadata) {
-  return this.client_.unaryCall(this.hostname_ +
-      '/primtech.citizen.CitizenService/GetCitizen',
+  return this.client_.serverStreaming(this.hostname_ +
+      '/primtech.game.GameService/StreamFrames',
       request,
       metadata || {},
-      methodDescriptor_CitizenService_GetCitizen);
+      methodDescriptor_GameService_StreamFrames);
 };
 
 
-module.exports = proto.primtech.citizen;
+module.exports = proto.primtech.game;
 

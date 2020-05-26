@@ -2,6 +2,7 @@
   <div id="app">
     <PageHeader msg="Primitive Technology"/>
     <CitizenTable/>
+    <FrameInfoPane/>
   </div>
 </template>
 
@@ -10,11 +11,13 @@ import { Component, Vue } from 'vue-property-decorator';
 
 import PageHeader from './components/PageHeader.vue';
 import CitizenTable from './components/CitizenTable.vue';
+import FrameInfoPane from './components/FrameInfoPane.vue';
 
 @Component({
   components: {
     PageHeader,
     CitizenTable,
+    FrameInfoPane,
   },
 })
 export default class App extends Vue {}

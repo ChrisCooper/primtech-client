@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+import "general.proto";
+
+package primtech.tech;
+
+service TechService {
+    rpc GetTech(Void) returns (Void) {};
+}

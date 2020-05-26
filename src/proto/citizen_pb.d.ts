@@ -1,16 +1,48 @@
 import * as jspb from "google-protobuf"
 
-export class Void extends jspb.Message {
+import * as general_pb from './general_pb';
+
+export class AptitudeLevel extends jspb.Message {
+  getAptitudeId(): number;
+  setAptitudeId(value: number): void;
+
+  getLevel(): number;
+  setLevel(value: number): void;
+
   serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): Void.AsObject;
-  static toObject(includeInstance: boolean, msg: Void): Void.AsObject;
-  static serializeBinaryToWriter(message: Void, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): Void;
-  static deserializeBinaryFromReader(message: Void, reader: jspb.BinaryReader): Void;
+  toObject(includeInstance?: boolean): AptitudeLevel.AsObject;
+  static toObject(includeInstance: boolean, msg: AptitudeLevel): AptitudeLevel.AsObject;
+  static serializeBinaryToWriter(message: AptitudeLevel, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): AptitudeLevel;
+  static deserializeBinaryFromReader(message: AptitudeLevel, reader: jspb.BinaryReader): AptitudeLevel;
 }
 
-export namespace Void {
+export namespace AptitudeLevel {
   export type AsObject = {
+    aptitudeId: number,
+    level: number,
+  }
+}
+
+export class SkillLevel extends jspb.Message {
+  getSkillId(): number;
+  setSkillId(value: number): void;
+
+  getLevel(): number;
+  setLevel(value: number): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): SkillLevel.AsObject;
+  static toObject(includeInstance: boolean, msg: SkillLevel): SkillLevel.AsObject;
+  static serializeBinaryToWriter(message: SkillLevel, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): SkillLevel;
+  static deserializeBinaryFromReader(message: SkillLevel, reader: jspb.BinaryReader): SkillLevel;
+}
+
+export namespace SkillLevel {
+  export type AsObject = {
+    skillId: number,
+    level: number,
   }
 }
 

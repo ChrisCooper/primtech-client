@@ -1,8 +1,18 @@
 syntax = "proto3";
 
-package primtech;
+import "general.proto";
 
-message Void {}
+package primtech.citizen;
+
+message AptitudeLevel {
+    int32 aptitude_id = 1;
+    double level = 2;
+}
+
+message SkillLevel {
+    int32 skill_id = 1;
+    double level = 2;
+}
 
 message Citizen {
     int32 id = 1;
@@ -11,7 +21,4 @@ message Citizen {
 
 service CitizenService {
     rpc GetCitizen(Void) returns (Citizen) {};
-//    rpc AddSongs(stream Song) returns (google.protobuf.Empty) {};
-//    rpc GetChat(Song) returns (stream Comment) {};
-//    rpc LiveChat(stream Comment) returns (stream Comment) {};
 }

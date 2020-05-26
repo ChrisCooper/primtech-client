@@ -1,12 +1,13 @@
-// process.version = 'v10.19.0';
-
 import Vue from 'vue';
 import * as grpcWeb from 'grpc-web';
 
 import App from './App.vue';
 
-import {Citizen, Void} from './proto/citizen_pb';
+import {Citizen} from './proto/citizen_pb';
 import {CitizenServiceClient} from './proto/citizen_grpc_web_pb';
+import { GameServiceClient } from './proto/game_grpc_web_pb';
+import { FrameInfo } from './proto/game_pb';
+import { Void } from './proto/general_pb';
 
 Vue.config.productionTip = false;
 
@@ -22,7 +23,7 @@ const request = new Void();
 
 const call = citizenClient.getCitizen(request, undefined,  (err: grpcWeb.Error, response: Citizen) => {
   if (err){
-    console.log("Received error sending request", err);
+    console.log("Received error sending Citizen request", err);
     return;
   }
 
@@ -38,4 +39,16 @@ call.on('status', (status: grpcWeb.Status) => {
   console.log(status.code);
   console.log(status.details);
   console.log(status.metadata);
+});
+
+
+const gameClient = new GameServiceClient('http://localhost:8080');
+
+const frameStream = gameClient.streamFrames(request, undefined);
+
+frameStream.on('data', (frameInfo: FrameInfo) => {
+  console.log("New FrameInfo", frameInfo);
+});
+frameStream.on('status', function(status) {
+  console.log("FrameStream status: ", status);
 });

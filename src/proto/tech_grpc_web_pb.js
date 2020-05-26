@@ -1,5 +1,5 @@
 /**
- * @fileoverview gRPC-Web generated client stub for primtech.citizen
+ * @fileoverview gRPC-Web generated client stub for primtech.tech
  * @enhanceable
  * @public
  */
@@ -15,7 +15,7 @@ grpc.web = require('grpc-web');
 var general_pb = require('./general_pb.js')
 const proto = {};
 proto.primtech = {};
-proto.primtech.citizen = require('./citizen_pb.js');
+proto.primtech.tech = require('./tech_pb.js');
 
 /**
  * @param {string} hostname
@@ -25,7 +25,7 @@ proto.primtech.citizen = require('./citizen_pb.js');
  * @struct
  * @final
  */
-proto.primtech.citizen.CitizenServiceClient =
+proto.primtech.tech.TechServiceClient =
     function(hostname, credentials, options) {
   if (!options) options = {};
   options['format'] = 'text';
@@ -51,7 +51,7 @@ proto.primtech.citizen.CitizenServiceClient =
  * @struct
  * @final
  */
-proto.primtech.citizen.CitizenServicePromiseClient =
+proto.primtech.tech.TechServicePromiseClient =
     function(hostname, credentials, options) {
   if (!options) options = {};
   options['format'] = 'text';
@@ -73,13 +73,13 @@ proto.primtech.citizen.CitizenServicePromiseClient =
  * @const
  * @type {!grpc.web.MethodDescriptor<
  *   !proto.primtech.Void,
- *   !proto.primtech.citizen.Citizen>}
+ *   !proto.primtech.Void>}
  */
-const methodDescriptor_CitizenService_GetCitizen = new grpc.web.MethodDescriptor(
-  '/primtech.citizen.CitizenService/GetCitizen',
+const methodDescriptor_TechService_GetTech = new grpc.web.MethodDescriptor(
+  '/primtech.tech.TechService/GetTech',
   grpc.web.MethodType.UNARY,
   general_pb.Void,
-  proto.primtech.citizen.Citizen,
+  general_pb.Void,
   /**
    * @param {!proto.primtech.Void} request
    * @return {!Uint8Array}
@@ -87,7 +87,7 @@ const methodDescriptor_CitizenService_GetCitizen = new grpc.web.MethodDescriptor
   function(request) {
     return request.serializeBinary();
   },
-  proto.primtech.citizen.Citizen.deserializeBinary
+  general_pb.Void.deserializeBinary
 );
 
 
@@ -95,10 +95,10 @@ const methodDescriptor_CitizenService_GetCitizen = new grpc.web.MethodDescriptor
  * @const
  * @type {!grpc.web.AbstractClientBase.MethodInfo<
  *   !proto.primtech.Void,
- *   !proto.primtech.citizen.Citizen>}
+ *   !proto.primtech.Void>}
  */
-const methodInfo_CitizenService_GetCitizen = new grpc.web.AbstractClientBase.MethodInfo(
-  proto.primtech.citizen.Citizen,
+const methodInfo_TechService_GetTech = new grpc.web.AbstractClientBase.MethodInfo(
+  general_pb.Void,
   /**
    * @param {!proto.primtech.Void} request
    * @return {!Uint8Array}
@@ -106,7 +106,7 @@ const methodInfo_CitizenService_GetCitizen = new grpc.web.AbstractClientBase.Met
   function(request) {
     return request.serializeBinary();
   },
-  proto.primtech.citizen.Citizen.deserializeBinary
+  general_pb.Void.deserializeBinary
 );
 
 
@@ -115,18 +115,18 @@ const methodInfo_CitizenService_GetCitizen = new grpc.web.AbstractClientBase.Met
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @param {function(?grpc.web.Error, ?proto.primtech.citizen.Citizen)}
+ * @param {function(?grpc.web.Error, ?proto.primtech.Void)}
  *     callback The callback function(error, response)
- * @return {!grpc.web.ClientReadableStream<!proto.primtech.citizen.Citizen>|undefined}
+ * @return {!grpc.web.ClientReadableStream<!proto.primtech.Void>|undefined}
  *     The XHR Node Readable Stream
  */
-proto.primtech.citizen.CitizenServiceClient.prototype.getCitizen =
+proto.primtech.tech.TechServiceClient.prototype.getTech =
     function(request, metadata, callback) {
   return this.client_.rpcCall(this.hostname_ +
-      '/primtech.citizen.CitizenService/GetCitizen',
+      '/primtech.tech.TechService/GetTech',
       request,
       metadata || {},
-      methodDescriptor_CitizenService_GetCitizen,
+      methodDescriptor_TechService_GetTech,
       callback);
 };
 
@@ -136,18 +136,18 @@ proto.primtech.citizen.CitizenServiceClient.prototype.getCitizen =
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @return {!Promise<!proto.primtech.citizen.Citizen>}
+ * @return {!Promise<!proto.primtech.Void>}
  *     A native promise that resolves to the response
  */
-proto.primtech.citizen.CitizenServicePromiseClient.prototype.getCitizen =
+proto.primtech.tech.TechServicePromiseClient.prototype.getTech =
     function(request, metadata) {
   return this.client_.unaryCall(this.hostname_ +
-      '/primtech.citizen.CitizenService/GetCitizen',
+      '/primtech.tech.TechService/GetTech',
       request,
       metadata || {},
-      methodDescriptor_CitizenService_GetCitizen);
+      methodDescriptor_TechService_GetTech);
 };
 
 
-module.exports = proto.primtech.citizen;
+module.exports = proto.primtech.tech;
 

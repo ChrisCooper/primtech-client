@@ -2,31 +2,29 @@ import * as grpcWeb from 'grpc-web';
 
 import * as general_pb from './general_pb';
 
-import {Citizen} from './citizen_pb';
-
-export class CitizenServiceClient {
+export class TechServiceClient {
   constructor (hostname: string,
                credentials?: null | { [index: string]: string; },
                options?: null | { [index: string]: string; });
 
-  getCitizen(
+  getTech(
     request: general_pb.Void,
     metadata: grpcWeb.Metadata | undefined,
     callback: (err: grpcWeb.Error,
-               response: Citizen) => void
-  ): grpcWeb.ClientReadableStream<Citizen>;
+               response: general_pb.Void) => void
+  ): grpcWeb.ClientReadableStream<general_pb.Void>;
 
 }
 
-export class CitizenServicePromiseClient {
+export class TechServicePromiseClient {
   constructor (hostname: string,
                credentials?: null | { [index: string]: string; },
                options?: null | { [index: string]: string; });
 
-  getCitizen(
+  getTech(
     request: general_pb.Void,
     metadata?: grpcWeb.Metadata
-  ): Promise<Citizen>;
+  ): Promise<general_pb.Void>;
 
 }
 
