@@ -1,17 +1,51 @@
 <template>
-  <div id="frame_info">
+  <div id="frame_info" class="frame">
     <h2>Frame Info</h2>
-    <span>Frame Number: {{ frameInfo.getFrameNumber() }}</span>
-    <span>Actual time: {{ frameInfo.getActualFrameTimeNanos() }}</span>
-    <span>Target time: {{ frameInfo.getTargetFrameTimeNanos() }}</span>
-    <span>Percentage: {{ frameBudgetUsedPercent }}</span>
+    <div>
+        <span class="label-name">Frame Number: </span><span>{{ frameInfo.getFrameNumber() }}</span>
+      <div>
+        <span class="label-name">Percentage: </span><span>{{ frameBudgetUsedPercent }}</span>
+      </div>
+    </div>
     
     <div>
-      <button v-on:click="pause">Pause</button>
+      <button class="pause-button" v-on:click="pause">
+        <span class="icon">
+          <i class="fas fa-pause"></i>
+        </span>
+        <span>Pause</span>
+      </button>
     </div>
   </div>
 </template>
 
+<!-- Styles -->
+<style scoped lang="scss">
+@import "bulma/sass/utilities/_all.sass";
+@import "bulma/sass/grid/tiles.sass";
+@import "bulma/sass/elements/button.sass";
+@import "bulma/sass/elements/notification.sass";
+
+.frame {
+  @extend .tile, .is-child, .is-primary, .notification, .is-4;
+}
+
+h2 {
+  display: block;
+}
+
+.pause-button {
+  margin-top: 20px;
+  @extend .button, .is-warning, .is-light, .is-outlined, .is-rounded, .is-small;
+}
+
+.label-name {
+  font-weight: bold;
+}
+
+</style>
+
+<!-- Code -->
 <script lang="ts">
 import { Component, Vue, Provide } from 'vue-property-decorator';
 import { GameServiceClient } from '../proto/game_grpc_web_pb';
@@ -51,9 +85,3 @@ export default class FrameInfoPane extends Vue {
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped lang="scss">
-h1 {
-  
-}
-</style>

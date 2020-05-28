@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@types/google-protobuf": "^3.7.2",
+    "bulma": "^0.8.2",
     "core-js": "^3.6.4",
     "grpc": "^1.24.2",
     "grpc-tools": "^1.8.1",
@@ -54,7 +55,9 @@
       "sourceType": "module"
     },
     "rules": {},
-    "ignorePatterns": ["src/proto/*"],
+    "ignorePatterns": [
+      "src/proto/*"
+    ],
     "overrides": [
       {
         "files": [

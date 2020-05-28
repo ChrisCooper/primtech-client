@@ -1,8 +1,10 @@
 <template>
-  <div id="app">
-    <PageHeader msg="Primitive Technology"/>
-    <CitizenTable/>
-    <FrameInfoPane/>
+  <div id="app" class="tile is-ancestor">
+    <div class="tile is-parent">
+      <PageHeader msg="Primitive Technology"/>
+      <FrameInfoPane/>
+      <CitizenTable/>
+    </div>
   </div>
 </template>
 
