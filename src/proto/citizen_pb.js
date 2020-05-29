@@ -432,8 +432,7 @@ proto.primtech.citizen.Citizen.prototype.toObject = function(opt_includeInstance
  */
 proto.primtech.citizen.Citizen.toObject = function(includeInstance, msg) {
   var f, obj = {
-    id: jspb.Message.getFieldWithDefault(msg, 1, 0),
-    name: jspb.Message.getFieldWithDefault(msg, 2, "")
+    id: jspb.Message.getFieldWithDefault(msg, 1, 0)
   };
 
   if (includeInstance) {
@@ -474,10 +473,6 @@ proto.primtech.citizen.Citizen.deserializeBinaryFromReader = function(msg, reade
       var value = /** @type {number} */ (reader.readInt32());
       msg.setId(value);
       break;
-    case 2:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setName(value);
-      break;
     default:
       reader.skipField();
       break;
@@ -514,13 +509,6 @@ proto.primtech.citizen.Citizen.serializeBinaryToWriter = function(message, write
       f
     );
   }
-  f = message.getName();
-  if (f.length > 0) {
-    writer.writeString(
-      2,
-      f
-    );
-  }
 };
 
 
@@ -539,24 +527,6 @@ proto.primtech.citizen.Citizen.prototype.getId = function() {
  */
 proto.primtech.citizen.Citizen.prototype.setId = function(value) {
   return jspb.Message.setProto3IntField(this, 1, value);
-};
-
-
-/**
- * optional string name = 2;
- * @return {string}
- */
-proto.primtech.citizen.Citizen.prototype.getName = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
-};
-
-
-/**
- * @param {string} value
- * @return {!proto.primtech.citizen.Citizen} returns this
- */
-proto.primtech.citizen.Citizen.prototype.setName = function(value) {
-  return jspb.Message.setProto3StringField(this, 2, value);
 };
 
 

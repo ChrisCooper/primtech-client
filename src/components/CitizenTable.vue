@@ -1,8 +1,32 @@
 <template>
-  <ul class="citizen-table">
-    <li>Citizen</li>
-  </ul>
+  <section>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th><abbr title="Nutrition">Nutr</abbr></th>
+        </tr>
+      </thead>
+      <tfoot>
+        <tr>
+          <th>ID</th>
+          <th><abbr title="Nutrition">Nutr</abbr></th>
+        </tr>
+      </tfoot>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>1503</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
 </template>
+
+<!-- Styles -->
+<style scoped lang="scss">
+
+</style>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
@@ -11,21 +35,3 @@ import { Component, Vue } from 'vue-property-decorator';
 export default class CitizenTable extends Vue {
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped lang="scss">
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-</style>

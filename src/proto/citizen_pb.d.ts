@@ -50,9 +50,6 @@ export class Citizen extends jspb.Message {
   getId(): number;
   setId(value: number): void;
 
-  getName(): string;
-  setName(value: string): void;
-
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Citizen.AsObject;
   static toObject(includeInstance: boolean, msg: Citizen): Citizen.AsObject;
@@ -64,7 +61,6 @@ export class Citizen extends jspb.Message {
 export namespace Citizen {
   export type AsObject = {
     id: number,
-    name: string,
   }
 }
 
