@@ -1,4 +1,3 @@
-
 import {scoped, Lifecycle} from "tsyringe"
 
 import {Skill, SkillLevel} from "./skills"
@@ -8,7 +7,7 @@ import {GameConfig} from "./config"
 import {TimeManager} from "./time"
 
 export class Citizen {
-    private nutrition = 48
+    public nutrition = 48
     private money = 0
 
     private currentActivity: Skill
@@ -21,7 +20,7 @@ export class Citizen {
         this.nutrition = 100
         this.currentActivity = Skill.RESTING
         this.money = 0
-        console.log(`Init Citizen ${id}`);
+        console.log(`Init Citizen ${id}`)
     }
 
     update() {
@@ -33,13 +32,15 @@ export class Citizen {
     }
 }
 
+
+
 @scoped(Lifecycle.ContainerScoped)
 export class CitizenManager {
     private citizens = new Array<Citizen>()
     private nextId = 1
 
     constructor(private config: GameConfig, private timeManager: TimeManager) {
-        console.log("Init CitizenManager");
+        console.log("Init CitizenManager")
 
         for (let i = 0; i < config.numStartingCitizens; i++) {
             this.spawnRandomCitizen()
@@ -47,11 +48,26 @@ export class CitizenManager {
     }
 
     spawnRandomCitizen() {
-        this.citizens.push(new Citizen(this.nextId, this.timeManager.currentTime))
+        this.citizens.push(new Citizen(this.nextId, this.timeManager.currentGameHour))
         this.nextId++
     }
-}
 
+    update() {
+        this.citizens.forEach(c => { c.update()})
+
+        const starvedCitizens = this.citizens.filter(c => c.nutrition < 0)
+
+        starvedCitizens.forEach(c =>{
+            const index = this.citizens.indexOf(c)
+            if (index > -1) {
+                // Replace 1 element following `index`
+                this.citizens.splice(index, 1)
+            }
+        })
+
+        console.log(`${starvedCitizens.length} citizens starved: ${starvedCitizens}`)
+    }
+}
 
 
 

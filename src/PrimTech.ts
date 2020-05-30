@@ -1,8 +1,16 @@
 import {CitizenManager} from "./citizens";
-import {injectable} from "tsyringe";
+import {scoped, Lifecycle} from "tsyringe";
 
-@injectable()
+@scoped(Lifecycle.ContainerScoped)
 export class PrimTech {
-  constructor(public citizens: CitizenManager) {}
+  constructor(public citizens: CitizenManager) {
+    console.log("Init PrimTech")
+  }
+
+  gameHour = 0
+  
+  runOneUpdateCycle() {
+    this.citizens.update()
+  }
 }
 

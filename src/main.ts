@@ -1,18 +1,18 @@
-import Vue from 'vue';
-import "reflect-metadata";
+import Vue from 'vue'
+import "reflect-metadata"
 
-import App from './App.vue';
+import App from './App.vue'
 
-Vue.config.productionTip = false;
+Vue.config.productionTip = false
 
+import {container} from "tsyringe"
+import {GameLoop} from "./loop"
 
-import {container} from "tsyringe";
-import {PrimTech} from "./PrimTech";
+const gameLoop = container.resolve(GameLoop)
 
-const myPrimTech = container.resolve(PrimTech);
-// myPrimTech.citizens => An instance of CitizenManager
+console.log(gameLoop)
 
-console.log(myPrimTech);
+gameLoop.runNextGameUpdateRepeatedlyUntilPaused()
 
 App
 // new Vue({
