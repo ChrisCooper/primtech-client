@@ -13,4 +13,3 @@ export class PrimTech {
     this.citizens.update()
   }
 }
-

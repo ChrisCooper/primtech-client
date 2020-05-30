@@ -33,7 +33,6 @@ export class Citizen {
 }
 
 
-
 @scoped(Lifecycle.ContainerScoped)
 export class CitizenManager {
     private citizens = new Array<Citizen>()
@@ -57,7 +56,7 @@ export class CitizenManager {
 
         const starvedCitizens = this.citizens.filter(c => c.nutrition < 0)
 
-        starvedCitizens.forEach(c =>{
+        starvedCitizens.forEach(c => {
             const index = this.citizens.indexOf(c)
             if (index > -1) {
                 // Replace 1 element following `index`
@@ -65,10 +64,9 @@ export class CitizenManager {
             }
         })
 
-        console.log(`${starvedCitizens.length} citizens starved: ${starvedCitizens}`)
+        if (starvedCitizens.length > 0) {
+            console.log(`${starvedCitizens.length} citizens starved: ${starvedCitizens}`)
+        }
     }
 }
-
-
-
 

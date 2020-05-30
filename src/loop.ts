@@ -1,9 +1,10 @@
-import {injectable} from "tsyringe"
+import {singleton} from "tsyringe"
 import {GameConfig} from "./config"
 import {TimeManager} from "./time"
-import {PrimTech} from "./PrimTech";
+import {PrimTech} from "./PrimTech"
+import {Utils} from "./utils"
 
-@injectable()
+@singleton()
 export class GameLoop {
     constructor(
         private config: GameConfig,
@@ -13,7 +14,10 @@ export class GameLoop {
         console.log("Init GameLoop")
     }
 
-    isPaused = false
+    public isPaused = false
+    public slidingWindowUpdateTimePercentage = 0
+
+    private previousUpdatePercentages = Array.from({length: 48}, () => 0)
 
     runNextGameUpdateRepeatedlyUntilPaused() {
         if (this.isPaused) {
@@ -29,9 +33,17 @@ export class GameLoop {
         const frameTotalTimeMs = frameEndTimeMs - frameStartTimeMs
 
         const percentage = frameTotalTimeMs / (this.config.tickTargetRuntimeUs / 1000) * 100
-        const timeUntilNextFrameStartMs = Math.max(0, this.config.tickTargetRuntimeUs / 1000 - frameTotalTimeMs)
+        this.updateFramePercentage(percentage)
 
-        console.log(`Frame took ${frameTotalTimeMs.toFixed(0)}ms, or ${percentage.toFixed(1)}%. Waiting ${timeUntilNextFrameStartMs.toFixed(0)}ms`)
+        const timeUntilNextFrameStartMs = Math.max(0, this.config.tickTargetRuntimeUs / 1000 - frameTotalTimeMs)
+        
+        //console.log(`Frame took ${frameTotalTimeMs.toFixed(0)}ms, or ${percentage.toFixed(1)}% (avg ${this.slidingWindowUpdateTimePercentage.toFixed(1)}%). Waiting ${timeUntilNextFrameStartMs.toFixed(0)}ms`)
         setTimeout(() => {this.runNextGameUpdateRepeatedlyUntilPaused()}, timeUntilNextFrameStartMs);
+    }
+
+    updateFramePercentage(percentage: number) {
+        this.previousUpdatePercentages.pop()
+        this.previousUpdatePercentages.unshift(percentage)
+        this.slidingWindowUpdateTimePercentage = Utils.average(this.previousUpdatePercentages)
     }
 }
