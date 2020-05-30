@@ -5,22 +5,16 @@
         <tr>
           <th>ID</th>
           <th><abbr title="Nutrition">Nutr</abbr></th>
+          <th><abbr title="Nutrition">Money</abbr></th>
+          <th><abbr title="Current Activity">Actv</abbr></th>
         </tr>
       </thead>
-      <tfoot>
-        <tr>
-          <th>ID</th>
-          <th><abbr title="Nutrition">Nutr</abbr></th>
-        </tr>
-      </tfoot>
       <tbody>
-        <tr>
-          <td>1</td>
-          <td>1503</td>
-        </tr>
-        <tr v-for="citizen in citizens" :key="citizen.id">
-          <td>REAL CITIZEN</td>
-          <td>EXISTS HERE</td>
+        <tr v-for="citizen in citizenManager.citizens" :key="citizen.id">
+          <td>{{ citizen.id }}</td>
+          <td>{{ citizen.nutrition }}</td>
+          <td>{{ citizen.money }}</td>
+          <td>{{ citizen.currentActivity.name }}</td>
         </tr>
       </tbody>
     </table>
@@ -33,11 +27,12 @@
 </style>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import { Citizen } from '../citizens';
+import {container} from "tsyringe" 
+import { Component, Vue } from 'vue-property-decorator'
+import { CitizenManager } from '../citizens'
 
 @Component
 export default class CitizenTable extends Vue {
-  private citizens: Array<Citizen> = []
+  private citizenManager = container.resolve(CitizenManager)
 }
 </script>

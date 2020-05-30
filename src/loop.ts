@@ -37,7 +37,7 @@ export class GameLoop {
 
         const timeUntilNextFrameStartMs = Math.max(0, this.config.tickTargetRuntimeUs / 1000 - frameTotalTimeMs)
         
-        //console.log(`Frame took ${frameTotalTimeMs.toFixed(0)}ms, or ${percentage.toFixed(1)}% (avg ${this.slidingWindowUpdateTimePercentage.toFixed(1)}%). Waiting ${timeUntilNextFrameStartMs.toFixed(0)}ms`)
+        // console.log(`Frame took ${frameTotalTimeMs.toFixed(0)}ms, or ${percentage.toFixed(1)}% (avg ${this.slidingWindowUpdateTimePercentage.toFixed(1)}%). Waiting ${timeUntilNextFrameStartMs.toFixed(0)}ms`)
         setTimeout(() => {this.runNextGameUpdateRepeatedlyUntilPaused()}, timeUntilNextFrameStartMs);
     }
 
