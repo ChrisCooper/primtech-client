@@ -4,14 +4,16 @@
       <thead>
         <tr>
           <th>ID</th>
+          <th><abbr title="Years Old">Age</abbr></th>
           <th><abbr title="Nutrition">Nutr</abbr></th>
-          <th><abbr title="Nutrition">Money</abbr></th>
+          <th>Money</th>
           <th><abbr title="Current Activity">Actv</abbr></th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="citizen in citizenManager.citizens" :key="citizen.id">
           <td>{{ citizen.id }}</td>
+          <td>{{ citizen.currentAgeYears }}</td>
           <td>{{ citizen.nutrition }}</td>
           <td>{{ citizen.money }}</td>
           <td>{{ citizen.currentActivity.name }}</td>

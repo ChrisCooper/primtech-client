@@ -22,7 +22,8 @@ export class Utils {
         return num;
     }
 
-    static skewNormalRangeInclusive(min: number, max: number, skew: number): number {
+    // https://stackoverflow.com/a/49434653
+    static skewNormalRangeInclusive(min: number, max: number, skew = 1): number {
         let u = 0, v = 0;
         while(u === 0) u = Math.random(); //Converting [0,1) to (0,1)
         while(v === 0) v = Math.random();
