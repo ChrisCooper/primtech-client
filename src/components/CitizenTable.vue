@@ -29,7 +29,7 @@
 <script lang="ts">
 import {container} from "tsyringe" 
 import { Component, Vue } from 'vue-property-decorator'
-import { CitizenManager } from '../citizens'
+import { CitizenManager } from '@/citizen/citizens'
 
 @Component
 export default class CitizenTable extends Vue {

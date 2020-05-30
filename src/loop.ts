@@ -1,8 +1,8 @@
 import {singleton} from "tsyringe"
-import {GameConfig} from "./config"
-import {TimeManager} from "./time"
-import {PrimTech} from "./PrimTech"
-import {Utils} from "./utils"
+import {GameConfig} from "@/config"
+import {TimeManager} from "@/time"
+import {PrimTech} from "@/PrimTech"
+import {Utils} from "@/utils"
 
 @singleton()
 export class GameLoop {

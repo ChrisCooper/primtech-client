@@ -1,10 +1,10 @@
 import {scoped, Lifecycle} from "tsyringe"
 
-import {Skill, SkillLevel} from "./skills"
-import {Aptitude, AptitudeLevel} from "./aptitudes"
-import {Supply} from "./supplies"
-import {GameConfig} from "./config"
-import {TimeManager} from "./time"
+import {Skill, SkillLevel} from "@/skills"
+import {Aptitude, AptitudeLevel} from "@/aptitudes"
+import {Supply} from "@/supplies"
+import {GameConfig} from "@/config"
+import {TimeManager} from "@/time"
 
 export class Citizen {
     public nutrition = 48
@@ -47,7 +47,14 @@ export class CitizenManager {
     }
 
     spawnRandomCitizen() {
-        this.citizens.push(new Citizen(this.nextId, this.timeManager.currentGameHour))
+        const c = new Citizen(this.nextId, this.timeManager.currentGameHour)
+
+        // Aptitude.values().forEach { ap -> c.aptitudes[ap] = ap.randomAptitude(ap) }
+        //     Skill.values().forEach { sk -> c.skills[sk] =
+        //         SkillLevel(0.0)
+        //     }
+
+        this.citizens.push(c)
         this.nextId++
     }
 

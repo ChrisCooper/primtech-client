@@ -1,4 +1,4 @@
-import {CitizenManager} from "./citizens";
+import {CitizenManager} from "@/citizen/citizens";
 import {scoped, Lifecycle} from "tsyringe";
 
 @scoped(Lifecycle.ContainerScoped)

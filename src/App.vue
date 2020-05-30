@@ -11,9 +11,9 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 
-import PageHeader from './components/PageHeader.vue';
-import CitizenTable from './components/CitizenTable.vue';
-import FrameInfoPane from './components/FrameInfoPane.vue';
+import PageHeader from '@/components/PageHeader.vue';
+import CitizenTable from '@/components/CitizenTable.vue';
+import FrameInfoPane from '@/components/FrameInfoPane.vue';
 
 @Component({
   components: {

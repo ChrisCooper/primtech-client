@@ -1,10 +1,10 @@
 import Vue from 'vue'
 import "reflect-metadata"
 
-import App from './App.vue'
+import App from '@/App.vue'
 
 import {container} from "tsyringe" 
-import {GameLoop} from "./loop"
+import {GameLoop} from "@/loop"
 
 Vue.config.productionTip = false
 

@@ -46,7 +46,7 @@ h2 {
 <script lang="ts">
 import {container} from "tsyringe" 
 import { Component, Vue } from 'vue-property-decorator'
-import {GameLoop} from "../loop"
+import {GameLoop} from "@/loop"
 
 @Component
 export default class FrameInfoPane extends Vue {
