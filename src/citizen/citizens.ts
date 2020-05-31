@@ -9,7 +9,7 @@ import {Utils} from "@/utils"
 import {container} from "tsyringe" 
 
 export class Citizen {
-    public nutrition = 48
+    public nutrition: number
     public money = 0
     public currentAgeYears = 0
 
@@ -22,7 +22,7 @@ export class Citizen {
     private gameConfig: GameConfig
     
     constructor(readonly id: number, private readonly birthdate: number) {
-        this.nutrition = 100
+        this.nutrition = Utils.skewNormalRangeInclusive(100, 200)
         this.currentActivity = Skill.RESTING
         this.money = 0
         console.log(`Init Citizen ${id}`)

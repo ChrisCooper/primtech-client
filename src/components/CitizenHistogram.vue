@@ -38,6 +38,8 @@ export default class CitizenHistogram extends Vue {
   chartWidth = 400
   margins = {top: 10, right: 30, bottom: 30, left: 40}
 
+  numBins = 10
+
   private totalHeight = this.chartHeight + this.margins.top + this.margins.bottom
   private totalWidth = this.chartWidth + this.margins.left + this.margins.right
 
@@ -48,11 +50,15 @@ export default class CitizenHistogram extends Vue {
 
   @Ref('mainGroup') readonly mainGroup!: HTMLElement
 
+  valueForCitizen(c: Citizen) {
+    return c.nutrition
+  }
+
   get histogram() {
     return d3.histogram<Citizen, number>()
-      .value((d) => {return d.currentAgeYears})
+      .value(this.valueForCitizen)
       .domain(this.xScaleInternal.domain() as [number, number])
-      .thresholds(this.xScaleInternal.ticks(10))
+      .thresholds(this.xScaleInternal.ticks(this.numBins))
   }
 
   bins() {
@@ -61,11 +67,12 @@ export default class CitizenHistogram extends Vue {
   }
 
   get xAxis() {
-    const maxVal = d3.max(this.data, function(d) { return d.currentAgeYears }) as number
+    const maxVal = d3.max(this.data, this.valueForCitizen) as number
 
     const xScale = this.xScaleInternal
       .domain([0, maxVal])
       .range([0, this.chartWidth])
+      .nice()
     return d3.axisBottom(xScale)
   }
 
@@ -75,6 +82,7 @@ export default class CitizenHistogram extends Vue {
     const y = this.yScaleInternal
       .range([this.chartHeight, 0])
       .domain([0, maxVal])   // d3.hist has to be called before the Y axis obviously
+      .nice()
     
     return d3.axisLeft(y)
   }
@@ -111,10 +119,22 @@ export default class CitizenHistogram extends Vue {
       .enter()
       .append("rect")
         .attr("x", 1)
-        .attr("transform", (d) => { return "translate(" + this.xScaleInternal(d.x0!) + "," + this.yScaleInternal(d.length) + ")" })
-        .attr("width", (d) => { return this.xScaleInternal(d.x1!) - this.xScaleInternal(d.x0!) - 1 })
-        .attr("height", (d) => { return this.chartHeight - this.yScaleInternal(d.length) })
+        .attr("transform", this.barTransformation)
+        .attr("width", this.barWidth)
+        .attr("height", this.barHeight)
         .style("fill", "#69b3a2")
+  }
+
+  barTransformation(d: d3.Bin<Citizen, number>) {
+    return "translate(" + this.xScaleInternal(d.x0!) + "," + this.yScaleInternal(d.length) + ")"
+  }
+
+  barWidth(d: d3.Bin<Citizen, number>) {
+    return this.xScaleInternal(d.x1!) - this.xScaleInternal(d.x0!) - 1 
+  }
+
+  barHeight(d: d3.Bin<Citizen, number>) {
+    return this.chartHeight - this.yScaleInternal(d.length)
   }
 }
 </script>
