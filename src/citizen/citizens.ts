@@ -41,7 +41,7 @@ export class Citizen {
 
 @scoped(Lifecycle.ContainerScoped)
 export class CitizenManager {
-    private citizens = new Array<Citizen>()
+    public citizens = new Array<Citizen>()
     private nextId = 1
 
     constructor(private config: GameConfig, private timeManager: TimeManager) {
