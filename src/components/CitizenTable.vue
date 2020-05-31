@@ -13,7 +13,7 @@
       <tbody>
         <tr v-for="citizen in citizenManager.citizens" :key="citizen.id">
           <td>{{ citizen.id }}</td>
-          <td>{{ citizen.currentAgeYears }}</td>
+          <td>{{ citizen.currentAgeYears.toFixed(0) }}</td>
           <td>{{ citizen.nutrition }}</td>
           <td>{{ citizen.money }}</td>
           <td>{{ citizen.currentActivity.name }}</td>
@@ -38,3 +38,4 @@ export default class CitizenTable extends Vue {
   private citizenManager = container.resolve(CitizenManager)
 }
 </script>
+ 

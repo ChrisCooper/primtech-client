@@ -2,6 +2,7 @@
   <div id="app" class="tile is-ancestor">
     <div class="tile is-parent">
       <PageHeader msg="Primitive Technology"/>
+      <CitizenHistogram/>
       <FrameInfoPane/>
       <CitizenTable/>
     </div>
@@ -13,11 +14,13 @@ import { Component, Vue } from 'vue-property-decorator';
 
 import PageHeader from '@/components/PageHeader.vue';
 import CitizenTable from '@/components/CitizenTable.vue';
+import CitizenHistogram from '@/components/CitizenHistogram.vue';
 import FrameInfoPane from '@/components/FrameInfoPane.vue';
 
 @Component({
   components: {
     PageHeader,
+    CitizenHistogram,
     CitizenTable,
     FrameInfoPane,
   },

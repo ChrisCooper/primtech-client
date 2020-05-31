@@ -53,11 +53,11 @@ export default class FrameInfoPane extends Vue {
   
   private gameLoop: GameLoop = container.resolve(GameLoop)
 
-  mounted(): void { 
+  mounted() { 
     console.log("FrameInfoPane mounted")
   }
 
-  pause(): void {
+  pause() {
     console.log("Pausing");
   }
 }

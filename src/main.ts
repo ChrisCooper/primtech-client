@@ -13,8 +13,8 @@ const gameLoop = container.resolve(GameLoop)
 
 console.log(gameLoop)
 
-gameLoop.runNextGameUpdateRepeatedlyUntilPaused()
-
 new Vue({
   render: (h) => h(App),
 }).$mount('#app');
+
+gameLoop.runNextGameUpdateRepeatedlyUntilPaused()
