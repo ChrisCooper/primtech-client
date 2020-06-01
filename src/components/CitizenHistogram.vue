@@ -48,40 +48,44 @@ export default class CitizenHistogram extends Vue {
   xScaleInternal = d3.scaleLinear()
   yScaleInternal = d3.scaleLinear()
 
+  dataUpdateDelay = 100
+
   @Ref('mainGroup') readonly mainGroup!: HTMLElement
 
   valueForCitizen(c: Citizen) {
     return c.nutrition
   }
 
-  get histogram() {
+  genHistogram() {
+    //console.log("histogram")
     return d3.histogram<Citizen, number>()
       .value(this.valueForCitizen)
       .domain(this.xScaleInternal.domain() as [number, number])
       .thresholds(this.xScaleInternal.ticks(this.numBins))
   }
 
-  bins() {
-    console.log("Bins")
-    return this.histogram(this.data)
+  bins(): d3.Bin<Citizen, number>[] {
+    //console.log("Bins")
+    const histogram = this.genHistogram()
+    return histogram(this.data)
   }
 
   get xAxis() {
     const maxVal = d3.max(this.data, this.valueForCitizen) as number
 
     const xScale = this.xScaleInternal
-      .domain([0, maxVal])
+      .domain([0, maxVal * (1.1)])
       .range([0, this.chartWidth])
       .nice()
     return d3.axisBottom(xScale)
   }
 
   get yAxis() {
-    const maxVal = d3.max(this.bins(), function(d) { return d.length }) as number
+    const maxVal = d3.max(this.bins(), (d) => d.length) as number
 
     const y = this.yScaleInternal
       .range([this.chartHeight, 0])
-      .domain([0, maxVal])   // d3.hist has to be called before the Y axis obviously
+      .domain([0, maxVal * (1.1)])   // d3.hist has to be called before the Y axis obviously
       .nice()
     
     return d3.axisLeft(y)
@@ -91,7 +95,7 @@ export default class CitizenHistogram extends Vue {
   private yAxisGroup: SVGGElement | null = null
 
   mounted(): void { 
-    console.log("CitizenHistogram mounted")
+    //console.log("CitizenHistogram mounted")
 
     this.$nextTick(() => {
       // Code that will run only after the
@@ -104,25 +108,54 @@ export default class CitizenHistogram extends Vue {
 
       this.yAxisGroup = mainGroup.append("g").node()
     
-      this.refresh()
+      this.refreshConstantly()
     })
   }
 
-  refresh() {
-    console.log("refresh")
+  async refreshConstantly() {
+    this.refresh()
+    setTimeout(() => this.refreshConstantly(), this.dataUpdateDelay);
+  }
+
+  reBinAndRescaleAxes() {
+    //console.log("reBinAndRescaleAxes")
 
     this.xAxis(d3.select(this.xAxisGroup!))
     this.yAxis(d3.select(this.yAxisGroup!))
+  }
 
-    d3.select(this.mainGroup!).selectAll("rect")
+  refresh() {
+    //console.log("refresh")
+
+    this.reBinAndRescaleAxes()
+
+    // Select the bar rectangles, or nothing if they haven't been created
+    const barElements = d3.select(this.mainGroup!).selectAll("rect")
       .data(this.bins())
-      .enter()
-      .append("rect")
-        .attr("x", 1)
-        .attr("transform", this.barTransformation)
-        .attr("width", this.barWidth)
-        .attr("height", this.barHeight)
-        .style("fill", "#69b3a2")
+
+    barElements
+      .join(
+        (enter) => {
+          return enter.append("rect")
+            .attr("x", 1)
+            .attr("transform", this.barTransformation)
+            .attr("width", this.barWidth)
+            .attr("height", this.barHeight)
+            .style("fill", "#69b3a2")
+        },
+        (update) => {
+          //console.log(this.bins)
+
+          return update
+            .attr("x", 1)
+            .attr("transform", this.barTransformation)
+            .attr("width", this.barWidth)
+            .attr("height", this.barHeight)
+            .style("fill", "#69b3a2")
+        },
+      )
+        
+      
   }
 
   barTransformation(d: d3.Bin<Citizen, number>) {

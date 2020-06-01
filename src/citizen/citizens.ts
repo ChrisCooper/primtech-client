@@ -22,7 +22,7 @@ export class Citizen {
     private gameConfig: GameConfig
     
     constructor(readonly id: number, private readonly birthdate: number) {
-        this.nutrition = Utils.skewNormalRangeInclusive(100, 200)
+        this.nutrition = Utils.skewNormalRangeInclusive(300, 2000)
         this.currentActivity = Skill.RESTING
         this.money = 0
         console.log(`Init Citizen ${id}`)
