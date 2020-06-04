@@ -4,9 +4,14 @@
       <g ref="mainGroup" v-bind:transform="marginTransform">
       </g>
     </svg>
-    <button class="change-scale" v-on:click="refresh">
-      Change scale
-    </button>
+    <div>
+      <button class="change-scale" v-on:click="setValueGetter(0)">
+        Nutrition
+      </button>
+      <button class="change-scale" v-on:click="setValueGetter(1)">
+        Age
+      </button>
+    </div>
   </section>
 </template>
 
@@ -19,18 +24,31 @@
 import {container} from "tsyringe" 
 import * as d3 from 'd3';
 
-import { Component, Vue, Ref } from 'vue-property-decorator'
+import { Component, Vue, Ref, Prop } from 'vue-property-decorator'
 import { CitizenManager, Citizen } from '@/citizen/citizens'
 
 
 type Range = [number, number]
-type SmallCitizen = {
-  id: string;
-  age: number;
-};
+
+type ValueGetter = {
+  name: string;
+  getter: (c: Citizen) => number;
+}
 
 @Component
 export default class CitizenHistogram extends Vue {
+
+  @Prop({default: 100}) dataUpdateDelay!: number
+  @Prop({default: 5000}) axesUpdateDelay!: number
+  @Prop({default: 10}) numBins!: number
+
+  @Prop() valueGettersForCitizen: Array<ValueGetter> =  [
+    {name: "Nutrition", getter: (c: Citizen): number => c.nutrition},
+    {name: "Age", getter: (c: Citizen): number => c.currentAgeYears},
+  ]
+
+  private valueGetter: (c: Citizen) => number = (c) => c.currentAgeYears
+
   citizenManager = container.resolve(CitizenManager)
   data = this.citizenManager.citizens
 
@@ -38,28 +56,27 @@ export default class CitizenHistogram extends Vue {
   chartWidth = 400
   margins = {top: 10, right: 30, bottom: 30, left: 40}
 
-  numBins = 10
-
   private totalHeight = this.chartHeight + this.margins.top + this.margins.bottom
   private totalWidth = this.chartWidth + this.margins.left + this.margins.right
 
-  marginTransform = `translate(${this.margins.left}, ${this.margins.top})`
+  private marginTransform = `translate(${this.margins.left}, ${this.margins.top})`
 
-  xScaleInternal = d3.scaleLinear()
-  yScaleInternal = d3.scaleLinear()
-
-  dataUpdateDelay = 100
+  private xScaleInternal = d3.scaleLinear()
+  private yScaleInternal = d3.scaleLinear()
 
   @Ref('mainGroup') readonly mainGroup!: HTMLElement
 
-  valueForCitizen(c: Citizen) {
-    return c.nutrition
+  setValueGetter(index: number) {
+    const vg = this.valueGettersForCitizen[index]
+    this.valueGetter = vg.getter
+
+    this.refreshAllOnce()
   }
 
   genHistogram() {
     //console.log("histogram")
     return d3.histogram<Citizen, number>()
-      .value(this.valueForCitizen)
+      .value(this.valueGetter)
       .domain(this.xScaleInternal.domain() as [number, number])
       .thresholds(this.xScaleInternal.ticks(this.numBins))
   }
@@ -71,7 +88,7 @@ export default class CitizenHistogram extends Vue {
   }
 
   get xAxis() {
-    const maxVal = d3.max(this.data, this.valueForCitizen) as number
+    const maxVal = d3.max(this.data, this.valueGetter) as number
 
     const xScale = this.xScaleInternal
       .domain([0, maxVal * (1.1)])
@@ -85,7 +102,7 @@ export default class CitizenHistogram extends Vue {
 
     const y = this.yScaleInternal
       .range([this.chartHeight, 0])
-      .domain([0, maxVal * (1.1)])   // d3.hist has to be called before the Y axis obviously
+      .domain([0, maxVal * (1.2)])   // d3.hist has to be called before the Y axis obviously
       .nice()
     
     return d3.axisLeft(y)
@@ -108,13 +125,24 @@ export default class CitizenHistogram extends Vue {
 
       this.yAxisGroup = mainGroup.append("g").node()
     
-      this.refreshConstantly()
+      this.refreshAxesConstantly()
+      this.refreshDataConstantly()
     })
   }
 
-  async refreshConstantly() {
-    this.refresh()
-    setTimeout(() => this.refreshConstantly(), this.dataUpdateDelay);
+  refreshAllOnce() {
+    this.reBinAndRescaleAxes()
+    this.refreshData()
+  }  
+
+  async refreshAxesConstantly() {
+    this.reBinAndRescaleAxes()
+    setTimeout(() => this.refreshAxesConstantly(), this.axesUpdateDelay)
+  }
+
+  async refreshDataConstantly() {
+    this.refreshData()
+    setTimeout(() => this.refreshDataConstantly(), this.dataUpdateDelay)
   }
 
   reBinAndRescaleAxes() {
@@ -124,10 +152,10 @@ export default class CitizenHistogram extends Vue {
     this.yAxis(d3.select(this.yAxisGroup!))
   }
 
-  refresh() {
+  refreshData() {
     //console.log("refresh")
 
-    this.reBinAndRescaleAxes()
+    //this.reBinAndRescaleAxes()
 
     // Select the bar rectangles, or nothing if they haven't been created
     const barElements = d3.select(this.mainGroup!).selectAll("rect")
