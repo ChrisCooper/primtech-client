@@ -5,12 +5,11 @@
       </g>
     </svg>
     <div>
-      <button class="change-scale" v-on:click="setValueGetter(0)">
-        Nutrition
-      </button>
-      <button class="change-scale" v-on:click="setValueGetter(1)">
-        Age
-      </button>
+      <span v-for="(vg, i) in valueGettersForCitizen" :key="vg.name">
+        <button v-on:click="setValueGetter(i)">
+          {{ vg.name }}
+        </button>
+      </span>
     </div>
   </section>
 </template>
@@ -45,6 +44,7 @@ export default class CitizenHistogram extends Vue {
   @Prop() valueGettersForCitizen: Array<ValueGetter> =  [
     {name: "Nutrition", getter: (c: Citizen): number => c.nutrition},
     {name: "Age", getter: (c: Citizen): number => c.currentAgeYears},
+    {name: "Money", getter: (c: Citizen): number => c.money},
   ]
 
   private valueGetter: (c: Citizen) => number = (c) => c.currentAgeYears
