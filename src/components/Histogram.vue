@@ -2,12 +2,12 @@
   <section>
     <svg className="container" v-bind:width="totalWidth" v-bind:height="totalHeight">
       <g ref="mainGroup" v-bind:transform="marginTransform"></g>
-      <text class="chart-title" text-anchor="middle" y="15" x="245">{{ this.valueGetter.title}} </text>
-      <text class="axis-label" text-anchor="end" transform="rotate(-90)" y="15" x="-7">{{ this.valueGetter.yTitle}} </text>
-      <text class="axis-label" text-anchor="end" x="445" y="250">{{ this.valueGetter.xTitle }}</text>
+      <text class="chart-title" text-anchor="middle" y="15" x="245">{{ this.currentValueGetter.title}} </text>
+      <text class="axis-label" text-anchor="end" transform="rotate(-90)" y="15" x="-7">{{ this.currentValueGetter.yTitle}} </text>
+      <text class="axis-label" text-anchor="end" x="445" y="250">{{ this.currentValueGetter.xTitle }}</text>
     </svg>
     <div>
-      <span v-for="(vg, i) in valueGettersForCitizen" :key="vg.name">
+      <span v-for="(vg, i) in histogramConfig.valueGetters" :key="vg.name">
         <button class="data-button" v-on:click="setValueGetter(i)">
           {{ vg.title }}
         </button>
@@ -32,41 +32,24 @@
 </style>
 
 <script lang="ts"> 
-import {container} from "tsyringe" 
 import * as d3 from 'd3';
-
 import { Component, Vue, Ref, Prop } from 'vue-property-decorator'
-import { CitizenManager, Citizen } from '@/citizen/citizens'
-import {GameConfig} from "@/config"
+import {ValueGetter, HistogramConfig} from "@/charts"
 
 type Range = [number, number] 
-
-type ValueGetter<TDataType> = {
-  title: string;
-  getter: (d: TDataType) => number;
-  xTitle: string;
-  yTitle: string;
-}
-
-const nutritionConfig = {title: "🥕 Nutrition", getter: (c: Citizen): number => c.nutritionDays, xTitle: "days remaining", yTitle: "# of citizens"}
-const ageConfig = {title: "👴 Age", getter: (c: Citizen): number => c.currentAgeYears, xTitle: "years old", yTitle: "# of citizens"}
-const moneyConfig = {title: "💲 Money", getter: (c: Citizen): number => c.money, xTitle: "dollars", yTitle: "# of citizens"}
+type TDataElem = any
 
 @Component
-export default class CitizenHistogram extends Vue {
+export default class Histogram extends Vue {
+  @Prop() histogramConfig!: HistogramConfig<TDataElem>
 
   @Prop({default: 500}) dataUpdateDelay!: number
   @Prop({default: 5000}) axesUpdateDelay!: number
   @Prop({default: 15}) numBins!: number
 
-  private valueGettersForCitizen: Array<ValueGetter<Citizen>> = [nutritionConfig, ageConfig, moneyConfig]
-    
-  private valueGetter: ValueGetter<Citizen> = this.valueGettersForCitizen[0]
+  private currentValueGetter!: ValueGetter<TDataElem>
 
-  private citizenManager = container.resolve(CitizenManager)
-  private config = container.resolve(GameConfig)
-
-  data = this.citizenManager.citizens
+  private data!: Array<TDataElem>
  
   chartHeight = 200
   chartWidth = 400
@@ -83,56 +66,18 @@ export default class CitizenHistogram extends Vue {
   private xAxisInternal = d3.axisBottom(this.xScaleInternal)
   private yAxisInternal = d3.axisLeft(this.yScaleInternal)
 
-  @Ref('mainGroup') readonly mainGroup!: HTMLElement
-
-  setValueGetter(index: number) {
-    const vg = this.valueGettersForCitizen[index]
-    this.valueGetter = vg
-
-    this.refreshAllOnce()
-  }
-
-  genHistogram() {
-    //console.log("histogram")
-    return d3.histogram<Citizen, number>()
-      .value(this.valueGetter.getter)
-      .domain(this.xScaleInternal.domain() as [number, number])
-      .thresholds(this.xScaleInternal.ticks(this.numBins))
-  }
-
-  bins(): d3.Bin<Citizen, number>[] {
-    //console.log("Bins")
-    const histogram = this.genHistogram()
-    return histogram(this.data)
-  }
-
-  recalculateXAxis() {
-    const maxVal = d3.max(this.data, this.valueGetter.getter) as number
-
-    this.xScaleInternal
-      .domain([0, maxVal * (1.1)])
-      .range([0, this.chartWidth])
-      .nice()
-
-    d3.select(this.xAxisGroup!).transition().duration(500).call(this.xAxisInternal)
-  }
-
-  recalculateYAxis() {
-    const maxVal = d3.max(this.bins(), (d) => d.length) as number
-
-    this.yScaleInternal
-      .range([this.chartHeight, 0])
-      .domain([0, maxVal * (1.2)])   // d3.hist has to be called before the Y axis obviously
-      .nice()
-
-    d3.select(this.yAxisGroup!).transition().duration(500).call(this.yAxisInternal)
-  }
-
   private xAxisGroup: SVGGElement | null = null
   private yAxisGroup: SVGGElement | null = null
 
+  @Ref('mainGroup') readonly mainGroup!: HTMLElement
+
+  created() {
+    this.data = this.histogramConfig.dataSource
+    this.currentValueGetter = this.histogramConfig.valueGetters[0]
+  }
+
   mounted(): void { 
-    //console.log("CitizenHistogram mounted")
+    //console.log("Histogram mounted")
     this.setValueGetter(0)
 
     this.$nextTick(() => {
@@ -149,6 +94,47 @@ export default class CitizenHistogram extends Vue {
       this.refreshAxesConstantly()
       this.refreshDataConstantly()
     })
+  }
+
+  setValueGetter(index: number) {
+    this.currentValueGetter = this.histogramConfig.valueGetters[index]
+    this.refreshAllOnce()
+  }
+
+  genHistogram() {
+    //console.log("histogram")
+    return d3.histogram<TDataElem, number>()
+      .value(this.currentValueGetter.getter)
+      .domain(this.xScaleInternal.domain() as [number, number])
+      .thresholds(this.xScaleInternal.ticks(this.numBins))
+  }
+
+  bins(): d3.Bin<TDataElem, number>[] {
+    //console.log("Bins")
+    const histogram = this.genHistogram()
+    return histogram(this.data)
+  }
+
+  recalculateXAxis() {
+    const maxVal = d3.max(this.data, this.currentValueGetter.getter) as number
+
+    this.xScaleInternal
+      .domain([0, maxVal * (1.1)])
+      .range([0, this.chartWidth])
+      .nice()
+
+    d3.select(this.xAxisGroup!).transition().duration(500).call(this.xAxisInternal)
+  }
+
+  recalculateYAxis() {
+    const maxVal = d3.max(this.bins(), (d) => d.length) as number
+
+    this.yScaleInternal
+      .range([this.chartHeight, 0])
+      .domain([0, maxVal * (1.2)])
+      .nice()
+
+    d3.select(this.yAxisGroup!).transition().duration(500).call(this.yAxisInternal)
   }
 
   refreshAllOnce() {
@@ -205,15 +191,15 @@ export default class CitizenHistogram extends Vue {
       )
   }
 
-  barTransformation(d: d3.Bin<Citizen, number>) {
+  barTransformation(d: d3.Bin<TDataElem, number>) {
     return "translate(" + this.xScaleInternal(d.x0!) + "," + this.yScaleInternal(d.length) + ")"
   }
 
-  barWidth(d: d3.Bin<Citizen, number>) {
+  barWidth(d: d3.Bin<TDataElem, number>) {
     return this.xScaleInternal(d.x1!) - this.xScaleInternal(d.x0!) - 1 
   }
 
-  barHeight(d: d3.Bin<Citizen, number>) {
+  barHeight(d: d3.Bin<TDataElem, number>) {
     return this.chartHeight - this.yScaleInternal(d.length)
   }
 }

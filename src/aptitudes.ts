@@ -4,12 +4,12 @@ export class AptitudeLevel {
 }
 export class Aptitude {
     constructor(
-        private mean: AptitudeLevel,
-        public hourly_energy_expenditure: number = 1.0) {
-        }
+        private mean: AptitudeLevel
+    ) {}
 
-    static DETAIL_WORK = new Aptitude(AptitudeLevel.of(10), 1.0)
-    static BRUTE_STRENGTH = new Aptitude(AptitudeLevel.of(10), 1.0)
-    static PLANNING = new Aptitude(AptitudeLevel.of(10), 1.0)
-    static FOCUS = new Aptitude(AptitudeLevel.of(10), 1.0)
+    static DETAIL_WORK = new Aptitude(AptitudeLevel.of(10))
+    static BRUTE_STRENGTH = new Aptitude(AptitudeLevel.of(10))
+    static PLANNING = new Aptitude(AptitudeLevel.of(10))
+    static FOCUS = new Aptitude(AptitudeLevel.of(10))
+    static OBSERVATION = new Aptitude(AptitudeLevel.of(10))
 }

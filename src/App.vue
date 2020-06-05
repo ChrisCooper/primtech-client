@@ -2,7 +2,7 @@
   <div id="app" class="tile is-ancestor">
     <div class="tile is-parent">
       <PageHeader msg="Primitive Technology"/>
-      <CitizenHistogram/>
+      <Histogram v-bind:histogramConfig="citizenHistogramConfig"/>
       <FrameInfoPane/>
       <CitizenTable/>
     </div>
@@ -14,18 +14,21 @@ import { Component, Vue } from 'vue-property-decorator';
 
 import PageHeader from '@/components/PageHeader.vue';
 import CitizenTable from '@/components/CitizenTable.vue';
-import CitizenHistogram from '@/components/CitizenHistogram.vue';
+import Histogram from '@/components/Histogram.vue';
 import FrameInfoPane from '@/components/FrameInfoPane.vue';
+import {citizenHistogramConfig} from "@/charts"
 
 @Component({
   components: {
     PageHeader,
-    CitizenHistogram,
+    Histogram,
     CitizenTable,
     FrameInfoPane,
   },
 })
-export default class App extends Vue {}
+export default class App extends Vue {
+  citizenHistogramConfig = citizenHistogramConfig
+}
 </script>
 
 <style lang="scss">

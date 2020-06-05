@@ -27,7 +27,7 @@ export class Citizen {
         this.nutrition = Utils.skewNormalRangeInclusive(this.config.startingNutritionHours * 0.7, this.config.startingNutritionHours * 1.3)
         this.currentActivity = Skill.RESTING
         this.money = 0
-        console.log(`Init Citizen ${id}`)
+        //console.log(`Init Citizen ${id}`)
     }
 
     get nutritionDays(): number{
@@ -55,6 +55,8 @@ export class Citizen {
 export class CitizenManager {
     public citizens = new Array<Citizen>()
     private nextId = 1
+
+    public recentActions: Array<Skill> = []
 
     constructor(private config: GameConfig, private timeManager: TimeManager) {
         console.log("Init CitizenManager")
@@ -93,6 +95,18 @@ export class CitizenManager {
         if (starvedCitizens.length > 0) {
             console.log(`${starvedCitizens.length} citizens starved: ${starvedCitizens}`)
         }
+
+        this.updateRecentActions()
+    }
+
+    updateRecentActions() {
+        this.citizens.forEach(c => {
+            if (this.recentActions.length > 0) {
+                this.recentActions.pop()
+            }
+
+            this.recentActions.unshift(c.currentActivity)
+        })
     }
 
     randomAgeHours(): number {
