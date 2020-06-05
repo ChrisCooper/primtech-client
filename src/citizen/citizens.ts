@@ -19,15 +19,19 @@ export class Citizen {
     private skills = new Map<Skill, SkillLevel>()
     private supplies = new Map<Supply, number>()
 
-    private gameConfig: GameConfig
+    private config: GameConfig
     
     constructor(readonly id: number, private readonly birthdate: number) {
-        this.gameConfig = container.resolve(GameConfig)
+        this.config = container.resolve(GameConfig)
 
-        this.nutrition = Utils.skewNormalRangeInclusive(this.gameConfig.startingNutritionHours * 0.7, this.gameConfig.startingNutritionHours * 1.3)
+        this.nutrition = Utils.skewNormalRangeInclusive(this.config.startingNutritionHours * 0.7, this.config.startingNutritionHours * 1.3)
         this.currentActivity = Skill.RESTING
         this.money = 0
         console.log(`Init Citizen ${id}`)
+    }
+
+    get nutritionDays(): number{
+        return this.nutrition / this.config.hoursPerDay
     }
 
     update(currentHour: number) {
@@ -41,8 +45,8 @@ export class Citizen {
 
         this.currentActivity.runForCitizen(this)
 
-        const currentAgeDays = (currentHour - this.birthdate) / this.gameConfig.hoursPerDay
-        this.currentAgeYears = currentAgeDays / this.gameConfig.daysPerYear
+        const currentAgeDays = (currentHour - this.birthdate) / this.config.hoursPerDay
+        this.currentAgeYears = currentAgeDays / this.config.daysPerYear
     }
 }
 

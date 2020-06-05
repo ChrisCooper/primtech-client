@@ -1,13 +1,15 @@
 <template>
   <section>
     <svg className="container" v-bind:width="totalWidth" v-bind:height="totalHeight">
-      <g ref="mainGroup" v-bind:transform="marginTransform">
-      </g>
+      <g ref="mainGroup" v-bind:transform="marginTransform"></g>
+      <text class="chart-title" text-anchor="middle" y="15" x="245">{{ this.valueGetter.title}} </text>
+      <text class="axis-label" text-anchor="end" transform="rotate(-90)" y="15" x="-7">{{ this.valueGetter.yTitle}} </text>
+      <text class="axis-label" text-anchor="end" x="445" y="250">{{ this.valueGetter.xTitle }}</text>
     </svg>
     <div>
       <span v-for="(vg, i) in valueGettersForCitizen" :key="vg.name">
         <button class="data-button" v-on:click="setValueGetter(i)">
-          {{ vg.name }}
+          {{ vg.title }}
         </button>
       </span>
     </div>
@@ -18,6 +20,10 @@
 <style scoped lang="scss">
 @import "bulma/sass/utilities/_all.sass";
 @import "bulma/sass/elements/button.sass";
+
+.axis-label {
+  fill: #888;
+}
 
 .data-button {
   margin: 5px;
@@ -33,13 +39,18 @@ import { Component, Vue, Ref, Prop } from 'vue-property-decorator'
 import { CitizenManager, Citizen } from '@/citizen/citizens'
 import {GameConfig} from "@/config"
 
-
 type Range = [number, number] 
 
-type ValueGetter = {
-  name: string;
-  getter: (c: Citizen) => number;
+type ValueGetter<TDataType> = {
+  title: string;
+  getter: (d: TDataType) => number;
+  xTitle: string;
+  yTitle: string;
 }
+
+const nutritionConfig = {title: "🥕 Nutrition", getter: (c: Citizen): number => c.nutritionDays, xTitle: "days remaining", yTitle: "# of citizens"}
+const ageConfig = {title: "👴 Age", getter: (c: Citizen): number => c.currentAgeYears, xTitle: "years old", yTitle: "# of citizens"}
+const moneyConfig = {title: "💲 Money", getter: (c: Citizen): number => c.money, xTitle: "dollars", yTitle: "# of citizens"}
 
 @Component
 export default class CitizenHistogram extends Vue {
@@ -48,13 +59,9 @@ export default class CitizenHistogram extends Vue {
   @Prop({default: 5000}) axesUpdateDelay!: number
   @Prop({default: 15}) numBins!: number
 
-  @Prop() valueGettersForCitizen: Array<ValueGetter> =  [
-    {name: "Nutrition", getter: (c: Citizen): number => c.nutrition / this.config.hoursPerDay},
-    {name: "Age", getter: (c: Citizen): number => c.currentAgeYears},
-    {name: "Money", getter: (c: Citizen): number => c.money},
-  ]
-
-  private valueGetter: (c: Citizen) => number = (c) => c.nutrition
+  private valueGettersForCitizen: Array<ValueGetter<Citizen>> = [nutritionConfig, ageConfig, moneyConfig]
+    
+  private valueGetter: ValueGetter<Citizen> = this.valueGettersForCitizen[0]
 
   private citizenManager = container.resolve(CitizenManager)
   private config = container.resolve(GameConfig)
@@ -63,7 +70,7 @@ export default class CitizenHistogram extends Vue {
  
   chartHeight = 200
   chartWidth = 400
-  margins = {top: 10, right: 30, bottom: 30, left: 40}
+  margins = {top: 20, right: 30, bottom: 40, left: 40}
 
   private totalHeight = this.chartHeight + this.margins.top + this.margins.bottom
   private totalWidth = this.chartWidth + this.margins.left + this.margins.right
@@ -80,7 +87,7 @@ export default class CitizenHistogram extends Vue {
 
   setValueGetter(index: number) {
     const vg = this.valueGettersForCitizen[index]
-    this.valueGetter = vg.getter
+    this.valueGetter = vg
 
     this.refreshAllOnce()
   }
@@ -88,7 +95,7 @@ export default class CitizenHistogram extends Vue {
   genHistogram() {
     //console.log("histogram")
     return d3.histogram<Citizen, number>()
-      .value(this.valueGetter)
+      .value(this.valueGetter.getter)
       .domain(this.xScaleInternal.domain() as [number, number])
       .thresholds(this.xScaleInternal.ticks(this.numBins))
   }
@@ -100,7 +107,7 @@ export default class CitizenHistogram extends Vue {
   }
 
   recalculateXAxis() {
-    const maxVal = d3.max(this.data, this.valueGetter) as number
+    const maxVal = d3.max(this.data, this.valueGetter.getter) as number
 
     this.xScaleInternal
       .domain([0, maxVal * (1.1)])
