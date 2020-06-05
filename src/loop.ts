@@ -1,6 +1,5 @@
 import {singleton} from "tsyringe"
 import {GameConfig} from "@/config"
-import {TimeManager} from "@/time"
 import {PrimTech} from "@/PrimTech"
 import {Utils} from "@/utils"
 
@@ -9,7 +8,6 @@ export class GameLoop {
     constructor(
         private config: GameConfig,
         private primTech: PrimTech,
-        private timeManager: TimeManager,
     ) {
         console.log("Init GameLoop")
     }

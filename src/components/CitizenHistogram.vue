@@ -31,6 +31,7 @@ import * as d3 from 'd3';
 
 import { Component, Vue, Ref, Prop } from 'vue-property-decorator'
 import { CitizenManager, Citizen } from '@/citizen/citizens'
+import {GameConfig} from "@/config"
 
 
 type Range = [number, number] 
@@ -45,17 +46,19 @@ export default class CitizenHistogram extends Vue {
 
   @Prop({default: 500}) dataUpdateDelay!: number
   @Prop({default: 5000}) axesUpdateDelay!: number
-  @Prop({default: 10}) numBins!: number
+  @Prop({default: 15}) numBins!: number
 
   @Prop() valueGettersForCitizen: Array<ValueGetter> =  [
-    {name: "Nutrition", getter: (c: Citizen): number => c.nutrition},
+    {name: "Nutrition", getter: (c: Citizen): number => c.nutrition / this.config.hoursPerDay},
     {name: "Age", getter: (c: Citizen): number => c.currentAgeYears},
     {name: "Money", getter: (c: Citizen): number => c.money},
   ]
 
   private valueGetter: (c: Citizen) => number = (c) => c.nutrition
 
-  citizenManager = container.resolve(CitizenManager)
+  private citizenManager = container.resolve(CitizenManager)
+  private config = container.resolve(GameConfig)
+
   data = this.citizenManager.citizens
  
   chartHeight = 200
@@ -123,6 +126,7 @@ export default class CitizenHistogram extends Vue {
 
   mounted(): void { 
     //console.log("CitizenHistogram mounted")
+    this.setValueGetter(0)
 
     this.$nextTick(() => {
       // Code that will run only after the

@@ -1,8 +1,10 @@
 <template>
   <div id="frame_info" class="frame">
-    <h2>Frame Info</h2>
     <div>
-      <span class="label-name">Percentage: </span><span>{{ gameLoop.slidingWindowUpdateTimePercentage.toFixed(1) }}%</span>
+      <span class="label-name">{{ yearsPassed }} years, {{ daysPassed }} days, {{ hoursPassed }} hours</span>
+    </div>
+    <div>
+      <span>Frame runtime percentage: </span><span>{{ gameLoop.slidingWindowUpdateTimePercentage.toFixed(1) }}%</span>
     </div>
     
     <div>
@@ -32,7 +34,7 @@ h2 {
 }
 
 .pause-button {
-  margin-top: 20px;
+  margin-top: 10px;
   @extend .button, .is-warning, .is-light, .is-outlined, .is-rounded, .is-small;
 }
 
@@ -47,11 +49,15 @@ h2 {
 import {container} from "tsyringe" 
 import { Component, Vue } from 'vue-property-decorator'
 import {GameLoop} from "@/loop"
+import {TimeManager} from "@/time"
+import {GameConfig} from "@/config"
 
 @Component
 export default class FrameInfoPane extends Vue {
   
   private gameLoop: GameLoop = container.resolve(GameLoop)
+  private timeManager: TimeManager = container.resolve(TimeManager)
+  private config: GameConfig = container.resolve(GameConfig)
 
   mounted() { 
     console.log("FrameInfoPane mounted")
@@ -59,6 +65,20 @@ export default class FrameInfoPane extends Vue {
 
   pause() {
     console.log("Pausing");
+  }
+
+  get yearsPassed(): number {
+    const hoursPassed = this.timeManager.currentGameHour
+    return Math.floor((hoursPassed / this.config.hoursPerDay) / this.config.daysPerYear)
+  }
+
+  get daysPassed(): number {
+    const extraHours = this.timeManager.currentGameHour
+    return Math.floor(extraHours / this.config.hoursPerDay - (this.yearsPassed * this.config.daysPerYear))
+  }
+
+  get hoursPassed(): number {
+    return this.timeManager.currentGameHour % this.config.hoursPerDay
   }
 }
 

@@ -22,16 +22,24 @@ export class Citizen {
     private gameConfig: GameConfig
     
     constructor(readonly id: number, private readonly birthdate: number) {
-        this.nutrition = Utils.skewNormalRangeInclusive(300, 2000)
+        this.gameConfig = container.resolve(GameConfig)
+
+        this.nutrition = Utils.skewNormalRangeInclusive(this.gameConfig.startingNutritionHours * 0.7, this.gameConfig.startingNutritionHours * 1.3)
         this.currentActivity = Skill.RESTING
         this.money = 0
         console.log(`Init Citizen ${id}`)
-
-        this.gameConfig = container.resolve(GameConfig)
     }
 
     update(currentHour: number) {
+        if (Utils.zeroOneUniformRandom() > 0.5) {
+            this.currentActivity = Skill.RESTING
+        } else {
+            this.currentActivity = Skill.FORAGING
+        }
+        
         this.nutrition -= this.currentActivity.hourly_energy_expenditure
+
+        this.currentActivity.runForCitizen(this)
 
         const currentAgeDays = (currentHour - this.birthdate) / this.gameConfig.hoursPerDay
         this.currentAgeYears = currentAgeDays / this.gameConfig.daysPerYear
@@ -84,7 +92,7 @@ export class CitizenManager {
     }
 
     randomAgeHours(): number {
-        const maxAgeHours = 70 * this.config.hoursPerDay * this.config.daysPerYear
+        const maxAgeHours = this.config.lifeExpectancyYears * this.config.hoursPerDay * this.config.daysPerYear * 0.7
 
         let ageHours = -1
         while (ageHours < 0 || ageHours > maxAgeHours) ageHours = Utils.skewNormalRangeInclusive(-maxAgeHours*2, maxAgeHours*2)
