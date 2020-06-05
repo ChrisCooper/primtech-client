@@ -8,7 +8,13 @@
     </div>
     
     <div>
-      <button class="pause-button" v-on:click="pause">
+      <button v-if="gameLoop.isPaused" class="pause-button" v-on:click="resume">
+        <span class="icon">
+          <i class="fas fa-play"></i>
+        </span>
+        <span>Resume</span>
+      </button>
+      <button v-else class="pause-button" v-on:click="pause">
         <span class="icon">
           <i class="fas fa-pause"></i>
         </span>
@@ -64,7 +70,12 @@ export default class FrameInfoPane extends Vue {
   }
 
   pause() {
-    console.log("Pausing");
+    this.gameLoop.isPaused = true
+  }
+
+  resume() {
+    this.gameLoop.isPaused = false
+    this.gameLoop.runNextGameUpdateRepeatedlyUntilPaused()
   }
 
   get yearsPassed(): number {
