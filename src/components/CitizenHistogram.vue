@@ -6,7 +6,7 @@
     </svg>
     <div>
       <span v-for="(vg, i) in valueGettersForCitizen" :key="vg.name">
-        <button v-on:click="setValueGetter(i)">
+        <button class="data-button" v-on:click="setValueGetter(i)">
           {{ vg.name }}
         </button>
       </span>
@@ -16,10 +16,16 @@
 
 <!-- Styles -->
 <style scoped lang="scss">
+@import "bulma/sass/utilities/_all.sass";
+@import "bulma/sass/elements/button.sass";
 
+.data-button {
+  margin: 5px;
+  @extend .button, .is-outlined, .is-rounded, .is-small;
+}
 </style>
 
-<script lang="ts">
+<script lang="ts"> 
 import {container} from "tsyringe" 
 import * as d3 from 'd3';
 
@@ -27,7 +33,7 @@ import { Component, Vue, Ref, Prop } from 'vue-property-decorator'
 import { CitizenManager, Citizen } from '@/citizen/citizens'
 
 
-type Range = [number, number]
+type Range = [number, number] 
 
 type ValueGetter = {
   name: string;
@@ -37,7 +43,7 @@ type ValueGetter = {
 @Component
 export default class CitizenHistogram extends Vue {
 
-  @Prop({default: 100}) dataUpdateDelay!: number
+  @Prop({default: 500}) dataUpdateDelay!: number
   @Prop({default: 5000}) axesUpdateDelay!: number
   @Prop({default: 10}) numBins!: number
 
@@ -47,11 +53,11 @@ export default class CitizenHistogram extends Vue {
     {name: "Money", getter: (c: Citizen): number => c.money},
   ]
 
-  private valueGetter: (c: Citizen) => number = (c) => c.currentAgeYears
+  private valueGetter: (c: Citizen) => number = (c) => c.nutrition
 
   citizenManager = container.resolve(CitizenManager)
   data = this.citizenManager.citizens
-
+ 
   chartHeight = 200
   chartWidth = 400
   margins = {top: 10, right: 30, bottom: 30, left: 40}
@@ -63,6 +69,9 @@ export default class CitizenHistogram extends Vue {
 
   private xScaleInternal = d3.scaleLinear()
   private yScaleInternal = d3.scaleLinear()
+
+  private xAxisInternal = d3.axisBottom(this.xScaleInternal)
+  private yAxisInternal = d3.axisLeft(this.yScaleInternal)
 
   @Ref('mainGroup') readonly mainGroup!: HTMLElement
 
@@ -87,25 +96,26 @@ export default class CitizenHistogram extends Vue {
     return histogram(this.data)
   }
 
-  get xAxis() {
+  recalculateXAxis() {
     const maxVal = d3.max(this.data, this.valueGetter) as number
 
-    const xScale = this.xScaleInternal
+    this.xScaleInternal
       .domain([0, maxVal * (1.1)])
       .range([0, this.chartWidth])
       .nice()
-    return d3.axisBottom(xScale)
+
+    d3.select(this.xAxisGroup!).transition().duration(500).call(this.xAxisInternal)
   }
 
-  get yAxis() {
+  recalculateYAxis() {
     const maxVal = d3.max(this.bins(), (d) => d.length) as number
 
-    const y = this.yScaleInternal
+    this.yScaleInternal
       .range([this.chartHeight, 0])
       .domain([0, maxVal * (1.2)])   // d3.hist has to be called before the Y axis obviously
       .nice()
-    
-    return d3.axisLeft(y)
+
+    d3.select(this.yAxisGroup!).transition().duration(500).call(this.yAxisInternal)
   }
 
   private xAxisGroup: SVGGElement | null = null
@@ -148,14 +158,12 @@ export default class CitizenHistogram extends Vue {
   reBinAndRescaleAxes() {
     //console.log("reBinAndRescaleAxes")
 
-    this.xAxis(d3.select(this.xAxisGroup!))
-    this.yAxis(d3.select(this.yAxisGroup!))
+    this.recalculateXAxis()
+    this.recalculateYAxis()
   }
 
   refreshData() {
-    //console.log("refresh")
-
-    //this.reBinAndRescaleAxes()
+    //console.log("refreshData")
 
     // Select the bar rectangles, or nothing if they haven't been created
     const barElements = d3.select(this.mainGroup!).selectAll("rect")
@@ -168,22 +176,22 @@ export default class CitizenHistogram extends Vue {
             .attr("x", 1)
             .attr("transform", this.barTransformation)
             .attr("width", this.barWidth)
-            .attr("height", this.barHeight)
             .style("fill", "#69b3a2")
+            .attr("height", this.barHeight)
         },
         (update) => {
-          //console.log(this.bins)
-
-          return update
+          update
+            .transition()
+            .duration(this.dataUpdateDelay * 0.9)
             .attr("x", 1)
             .attr("transform", this.barTransformation)
             .attr("width", this.barWidth)
             .attr("height", this.barHeight)
             .style("fill", "#69b3a2")
+
+          return update
         },
       )
-        
-      
   }
 
   barTransformation(d: d3.Bin<Citizen, number>) {
