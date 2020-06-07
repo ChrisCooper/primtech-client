@@ -8,6 +8,8 @@
           <th><abbr title="Nutrition">Nutr</abbr></th>
           <th>Money</th>
           <th><abbr title="Current Activity">Actv</abbr></th>
+          <th><abbr title="Parents">Prnts</abbr></th>
+          <th><abbr title="Children">Chlds</abbr></th>
         </tr>
       </thead>
       <tbody>
@@ -17,6 +19,8 @@
           <td>{{ citizen.nutrition.toFixed(0) }}</td>
           <td>{{ citizen.money }}</td>
           <td>{{ citizen.currentActivity.name }}</td>
+          <td>{{ citizen.showParents() }}</td>
+          <td>{{ citizen.showChildren() }}</td>
         </tr>
       </tbody>
     </table>

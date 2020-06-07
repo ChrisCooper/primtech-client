@@ -18,6 +18,7 @@ export class Citizen {
 
     public parents = new Array<Citizen>()
     public children = new Array<Citizen>()
+    public spouse: Citizen | null = null
 
     private aptitudes = new Map<Aptitude, AptitudeLevel>()
     private skills = new Map<Skill, SkillLevel>()
@@ -53,6 +54,28 @@ export class Citizen {
         this.currentAgeYears = currentAgeDays / this.config.daysPerYear
         this.currentAgeHours = this.currentAgeYears * this.config.hoursPerYear
     }
+
+    showParents() {
+        return this.parents.map(c => c.id).join(",")
+    }
+
+    showChildren() {
+        return this.children.map(c => c.id).join(",")
+    }
+
+    die() {
+        this.parents.map(c => c.unlink(this))
+        this.children.map(c => c.unlink(this))
+    }
+
+    unlink(c: Citizen) {
+        const pIndex = this.parents.indexOf(c)
+        const cIndex = this.children.indexOf(c)
+
+        // Replace 1 element following `index`
+        this.parents.splice(pIndex, 1)
+        this.children.splice(cIndex, 1)
+    }
 }
 
 
@@ -76,15 +99,21 @@ export class CitizenManager {
         const p1 = this.spawnRandomCitizen(parentAgeHours)
         const p2 = this.spawnRandomCitizen(this.ageM.randomParentAgeHours())
 
+        p1.spouse = p2
+        p2.spouse = p1
+
         const theoreticalMaxChildren = Math.floor((parentAgeHours - this.config.eligibleParentAgeHours) / this.config.minTimeBetweenChildrenHours)
         const maxChildren = Math.min(this.config.maxStartingChildrenPerFamily, theoreticalMaxChildren)
 
         const numChildren = Math.floor(Utils.normalFalloff(0, maxChildren, true))
 
-        console.log(`Age ${(parentAgeHours / this.config.hoursPerYear).toFixed(1)}, Num children ${numChildren}`)
-
         for (let i = 0; i < numChildren; i++) {
-            this.spawnRandomCitizen(this.ageM.randomChildAgeForParentAgeHours(parentAgeHours))
+            const c = this.spawnRandomCitizen(this.ageM.randomChildAgeForParentAgeHours(parentAgeHours))
+
+            p1.children.push(c)
+            p2.children.push(c)
+
+            c.parents = [p1, p2]
         }
     }
 
@@ -109,6 +138,8 @@ export class CitizenManager {
         const starvedCitizens = this.citizens.filter(c => c.nutrition < 0)
 
         starvedCitizens.forEach(c => {
+            c.die()
+
             const index = this.citizens.indexOf(c)
             if (index > -1) {
                 // Replace 1 element following `index`
