@@ -35,9 +35,20 @@
 import * as d3 from 'd3';
 import { Component, Vue, Ref, Prop } from 'vue-property-decorator'
 import {ValueGetter, HistogramConfig} from "@/charts"
+import {container, scoped, Lifecycle} from "tsyringe" 
+import {SelectionManager} from "@/selection"
 
-type Range = [number, number] 
+type Range = [number, number]
 type TDataElem = any
+
+class BarType {
+  constructor(
+    public bins: d3.Bin<any, number>[],
+    public colorString: string,
+    public classString: string,
+    public isSelection: boolean,
+  ) {}
+}
 
 @Component
 export default class Histogram extends Vue {
@@ -47,6 +58,7 @@ export default class Histogram extends Vue {
   @Prop({default: 5000}) axesUpdateDelay!: number
   @Prop({default: 15}) numBins!: number
 
+  private selectionM = container.resolve(SelectionManager)
   private currentValueGetter!: ValueGetter<TDataElem>
 
   private data!: Array<TDataElem>
@@ -109,10 +121,13 @@ export default class Histogram extends Vue {
       .thresholds(this.xScaleInternal.ticks(this.numBins))
   }
 
-  bins(): d3.Bin<TDataElem, number>[] {
+  bins(useSelection = false): d3.Bin<TDataElem, number>[] {
     //console.log("Bins")
     const histogram = this.genHistogram()
-    return histogram(this.data)
+
+    const data = useSelection ? this.selectionM.selection : this.data
+
+    return histogram(data)
   }
 
   recalculateXAxis() {
@@ -148,7 +163,7 @@ export default class Histogram extends Vue {
   }
 
   async refreshDataConstantly() {
-    this.refreshData()
+    this.refreshData(true)
     setTimeout(() => this.refreshDataConstantly(), this.dataUpdateDelay)
   }
 
@@ -159,36 +174,71 @@ export default class Histogram extends Vue {
     this.recalculateYAxis()
   }
 
-  refreshData() {
+  refreshData(useTransition = false) {
     //console.log("refreshData")
 
     // Select the bar rectangles, or nothing if they haven't been created
     const barElements = d3.select(this.mainGroup!).selectAll("rect")
       .data(this.bins())
 
-    barElements
-      .join(
-        (enter) => {
-          return enter.append("rect")
-            .attr("x", 1)
-            .attr("transform", this.barTransformation)
-            .attr("width", this.barWidth)
-            .style("fill", "#69b3a2")
-            .attr("height", this.barHeight)
-        },
-        (update) => {
-          update
-            .transition()
-            .duration(this.dataUpdateDelay * 0.9)
-            .attr("x", 1)
-            .attr("transform", this.barTransformation)
-            .attr("width", this.barWidth)
-            .attr("height", this.barHeight)
-            .style("fill", "#69b3a2")
+    const barTypes: Array<BarType> = [
+      new BarType(this.bins(), "#69b3a2", "", false),
+      new BarType(this.bins(true), "#1b6eff", "selection", false),
+    ]
 
-          return update
-        },
-      )
+    barTypes.forEach(barType => {
+      let selectString = "rect"
+      if (barType.classString != "") {
+        selectString = `${selectString}.${barType.classString}` 
+      }
+
+      const barElements = d3.select(this.mainGroup!).selectAll(selectString)
+        .data(barType.bins)
+
+      barElements
+        .join(
+          (enter) => {
+            let e = enter.append("rect")
+              .attr("class", barType.classString)
+              .attr("x", 1)
+              .attr("transform", this.barTransformation)
+              .attr("width", this.barWidth)
+              .style("fill", barType.colorString)
+              .attr("height", this.barHeight)
+            
+            if (!barType.isSelection) {
+              e = e.on("click", datum => {
+                if (d3.event.shiftKey) {
+                  this.selectionM.addToSelection(datum)
+                } else if (d3.event.ctrlKey) {
+                  this.selectionM.removeFromSelection(datum)
+                } else {
+                  this.selectionM.select(datum)
+                }
+              })
+            }
+
+            return e
+          },
+          (update) => {
+            let u = update
+
+            if (useTransition) {
+              u = u
+              .transition()
+              .duration(this.dataUpdateDelay * 0.9) as any
+            }
+            u
+              .attr("x", 1)
+              .attr("transform", this.barTransformation)
+              .attr("width", this.barWidth)
+              .attr("height", this.barHeight)
+              .style("fill", barType.colorString)
+
+            return update
+          },
+        )
+      });
   }
 
   barTransformation(d: d3.Bin<TDataElem, number>) {

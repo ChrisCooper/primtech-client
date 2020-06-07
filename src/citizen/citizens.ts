@@ -89,7 +89,7 @@ export class CitizenManager {
     constructor(private config: GameConfig, private timeManager: TimeManager, private ageM: AgeManager) {
         console.log("Init CitizenManager")
 
-        for (let i = 0; i < config.numStartingCitizens; i++) {
+        for (let i = 0; i < config.numStartingFamilies; i++) {
             this.spawnFamily()
         }
     }

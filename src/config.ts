@@ -2,7 +2,7 @@ import {scoped, Lifecycle} from "tsyringe";
 
 @scoped(Lifecycle.ContainerScoped)
 export class GameConfig {
-    public numStartingCitizens = 100
+    public numStartingFamilies = 40
     public maxStartingChildrenPerFamily = 5
 
     public hoursPerDay = 16
