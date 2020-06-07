@@ -1,4 +1,4 @@
-import {scoped, Lifecycle} from "tsyringe"
+import {scoped, Lifecycle, container} from "tsyringe"
 
 import {Skill, SkillLevel} from "@/skills"
 import {Aptitude, AptitudeLevel} from "@/aptitudes"
@@ -6,14 +6,18 @@ import {Supply} from "@/supplies"
 import {GameConfig} from "@/config"
 import {TimeManager} from "@/time"
 import {Utils} from "@/utils"
-import {container} from "tsyringe" 
+import {AgeManager} from "@/citizen/age"
 
 export class Citizen {
     public nutrition: number
     public money = 0
     public currentAgeYears = 0
+    public currentAgeHours = 0
 
     public  currentActivity: Skill
+
+    public parents = new Array<Citizen>()
+    public children = new Array<Citizen>()
 
     private aptitudes = new Map<Aptitude, AptitudeLevel>()
     private skills = new Map<Skill, SkillLevel>()
@@ -21,7 +25,7 @@ export class Citizen {
 
     private config: GameConfig
     
-    constructor(readonly id: number, private readonly birthdate: number) {
+    constructor(readonly id: number, private readonly birthdateHours: number) {
         this.config = container.resolve(GameConfig)
 
         this.nutrition = Utils.skewNormalRangeInclusive(this.config.startingNutritionHours * 0.7, this.config.startingNutritionHours * 1.3)
@@ -45,8 +49,9 @@ export class Citizen {
 
         this.currentActivity.runForCitizen(this)
 
-        const currentAgeDays = (currentHour - this.birthdate) / this.config.hoursPerDay
+        const currentAgeDays = (currentHour - this.birthdateHours) / this.config.hoursPerDay
         this.currentAgeYears = currentAgeDays / this.config.daysPerYear
+        this.currentAgeHours = this.currentAgeYears * this.config.hoursPerYear
     }
 }
 
@@ -58,17 +63,34 @@ export class CitizenManager {
 
     public recentActions: Array<Skill> = []
 
-    constructor(private config: GameConfig, private timeManager: TimeManager) {
+    constructor(private config: GameConfig, private timeManager: TimeManager, private ageM: AgeManager) {
         console.log("Init CitizenManager")
 
         for (let i = 0; i < config.numStartingCitizens; i++) {
-            this.spawnRandomCitizen()
+            this.spawnFamily()
         }
     }
 
-    spawnRandomCitizen() {
-        const birthdate = this.timeManager.currentGameHour - this.randomAgeHours()
-        const c = new Citizen(this.nextId, birthdate)
+    spawnFamily() {
+        const parentAgeHours = this.ageM.randomParentAgeHours()
+        const p1 = this.spawnRandomCitizen(parentAgeHours)
+        const p2 = this.spawnRandomCitizen(this.ageM.randomParentAgeHours())
+
+        const theoreticalMaxChildren = Math.floor((parentAgeHours - this.config.eligibleParentAgeHours) / this.config.minTimeBetweenChildrenHours)
+        const maxChildren = Math.min(this.config.maxStartingChildrenPerFamily, theoreticalMaxChildren)
+
+        const numChildren = Math.floor(Utils.normalFalloff(0, maxChildren, true))
+
+        console.log(`Age ${(parentAgeHours / this.config.hoursPerYear).toFixed(1)}, Num children ${numChildren}`)
+
+        for (let i = 0; i < numChildren; i++) {
+            this.spawnRandomCitizen(this.ageM.randomChildAgeForParentAgeHours(parentAgeHours))
+        }
+    }
+
+    spawnRandomCitizen(ageHours: number) {
+        const birthdateHours = this.timeManager.currentGameHour - ageHours
+        const c = new Citizen(this.nextId, birthdateHours)
 
         // Aptitude.values().forEach { ap -> c.aptitudes[ap] = ap.randomAptitude(ap) }
         //     Skill.values().forEach { sk -> c.skills[sk] =
@@ -77,6 +99,8 @@ export class CitizenManager {
 
         this.citizens.push(c)
         this.nextId++
+
+        return c
     }
 
     update() {
@@ -109,12 +133,5 @@ export class CitizenManager {
         })
     }
 
-    randomAgeHours(): number {
-        const maxAgeHours = this.config.lifeExpectancyYears * this.config.hoursPerDay * this.config.daysPerYear * 0.7
-
-        let ageHours = -1
-        while (ageHours < 0 || ageHours > maxAgeHours) ageHours = Utils.skewNormalRangeInclusive(-maxAgeHours*2, maxAgeHours*2)
-        return ageHours
-    }
 }
 
