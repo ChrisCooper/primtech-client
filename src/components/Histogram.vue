@@ -1,7 +1,10 @@
 <template>
   <section>
     <svg className="container" v-bind:width="totalWidth" v-bind:height="totalHeight">
-      <g ref="mainGroup" v-bind:transform="marginTransform"></g>
+      <g ref="mainGroup" v-bind:transform="marginTransform">
+        <g ref="barsGroup" class="barsGroup"></g>
+        <g ref="selectionBarsGroup" class="selectionBarsGroup"></g>
+      </g>
       <text class="chart-title" text-anchor="middle" y="15" x="245">{{ this.currentValueGetter.title}} </text>
       <text class="axis-label" text-anchor="end" transform="rotate(-90)" y="15" x="-7">{{ this.currentValueGetter.yTitle}} </text>
       <text class="axis-label" text-anchor="end" x="445" y="250">{{ this.currentValueGetter.xTitle }}</text>
@@ -43,6 +46,7 @@ type TDataElem = any
 
 class BarType {
   constructor(
+    public group: HTMLElement,
     public bins: d3.Bin<any, number>[],
     public colorString: string,
     public classString: string,
@@ -82,6 +86,8 @@ export default class Histogram extends Vue {
   private yAxisGroup: SVGGElement | null = null
 
   @Ref('mainGroup') readonly mainGroup!: HTMLElement
+  @Ref('barsGroup') readonly barsGroup!: HTMLElement
+  @Ref('selectionBarsGroup') readonly selectionBarsGroup!: HTMLElement
 
   created() {
     this.data = this.histogramConfig.dataSource
@@ -98,10 +104,11 @@ export default class Histogram extends Vue {
       const mainGroup = d3.select(this.mainGroup)
 
       this.xAxisGroup = mainGroup.append("g")
+      .attr("class", "xA xis")
       .attr("transform", "translate(0," + this.chartHeight + ")")
       .node()
 
-      this.yAxisGroup = mainGroup.append("g").node()
+      this.yAxisGroup = mainGroup.append("g").attr("class", "yAxis").node()
     
       this.refreshAxesConstantly()
       this.refreshDataConstantly()
@@ -182,8 +189,8 @@ export default class Histogram extends Vue {
       .data(this.bins())
 
     const barTypes: Array<BarType> = [
-      new BarType(this.bins(), "#69b3a2", "", false),
-      new BarType(this.bins(true), "#1b6eff", "selection", false),
+      new BarType(this.barsGroup, this.bins(), "#69b3a2", "", false),
+      new BarType(this.selectionBarsGroup, this.bins(true), "#1b6eff", "selection", false),
     ]
 
     barTypes.forEach(barType => {
@@ -192,7 +199,7 @@ export default class Histogram extends Vue {
         selectString = `${selectString}.${barType.classString}` 
       }
 
-      const barElements = d3.select(this.mainGroup!).selectAll(selectString)
+      const barElements = d3.select(barType.group).selectAll(selectString)
         .data(barType.bins)
 
       barElements
@@ -246,7 +253,8 @@ export default class Histogram extends Vue {
   }
 
   barWidth(d: d3.Bin<TDataElem, number>) {
-    return this.xScaleInternal(d.x1!) - this.xScaleInternal(d.x0!) - 1 
+    const width = this.xScaleInternal(d.x1!) - this.xScaleInternal(d.x0!) - 1
+    return Math.max(0, width)
   }
 
   barHeight(d: d3.Bin<TDataElem, number>) {

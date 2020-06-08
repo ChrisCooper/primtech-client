@@ -13,7 +13,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="citizen in citizenManager.citizens" :key="citizen.id">
+        <tr v-for="citizen in citizenManager.citizens" :key="citizen.id" v-bind:class="{ 'is-selected': selectionM.isSelected(citizen) }">
           <td>{{ citizen.id }}</td>
           <td>{{ citizen.currentAgeYears.toFixed(0) }}</td>
           <td>{{ citizen.nutrition.toFixed(0) }}</td>
@@ -29,6 +29,8 @@
 
 <!-- Styles -->
 <style scoped lang="scss">
+@import "bulma/sass/utilities/_all.sass";
+@import "bulma/sass/elements/table.sass";
 
 </style>
 
@@ -36,10 +38,12 @@
 import {container} from "tsyringe" 
 import { Component, Vue } from 'vue-property-decorator'
 import { CitizenManager } from '@/citizen/citizens'
+import { SelectionManager } from '../selection'
 
 @Component
 export default class CitizenTable extends Vue {
   private citizenManager = container.resolve(CitizenManager)
+  private selectionM = container.resolve(SelectionManager)  
 }
 </script>
  

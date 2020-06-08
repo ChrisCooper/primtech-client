@@ -12,6 +12,7 @@ export class SelectionManager {
     constructor(private config: GameConfig, private timeManager: TimeManager) {}
 
     public selection = new Array<Citizen>()
+    public selectionSet = new Set<Citizen>()
 
     public listeners = new Array<SelectionListener>()
 
@@ -21,6 +22,7 @@ export class SelectionManager {
 
     select(citizens: Array<Citizen>) {
         this.selection = citizens
+        this.updateSet()
         this.listeners.forEach(func => func(this.selection))
     }
 
@@ -30,6 +32,7 @@ export class SelectionManager {
                 this.selection.push(c)
             }
         })
+        this.updateSet()
         this.listeners.forEach(func => func(this.selection))
     }
 
@@ -40,7 +43,16 @@ export class SelectionManager {
                 this.selection.splice(index, 1)
             }
         })
+        this.updateSet()
         this.listeners.forEach(func => func(this.selection))
+    }
+
+    isSelected(c: Citizen) {
+        return this.selectionSet.has(c)
+    }
+
+    private updateSet() {
+        this.selectionSet = new Set(this.selection)
     }
 }
 
