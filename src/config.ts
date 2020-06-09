@@ -4,6 +4,7 @@ import {scoped, Lifecycle} from "tsyringe";
 export class GameConfig {
     public numStartingFamilies = 40
     public maxStartingChildrenPerFamily = 5
+    public maxStartingMoney = 10
 
     public hoursPerDay = 16
     public daysPerYear = 120

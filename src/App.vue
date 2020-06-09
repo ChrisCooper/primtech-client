@@ -4,6 +4,7 @@
       <PageHeader msg="Primitive Technology"/>
       <Histogram v-bind:histogramConfig="citizenHistogramConfig"/>
       <Histogram v-bind:histogramConfig="citizenHistogramConfig"/>
+      <Histogram v-bind:histogramConfig="citizenHistogramConfig"/>
       <FrameInfoPane/>
       <CitizenTable/>
     </div>

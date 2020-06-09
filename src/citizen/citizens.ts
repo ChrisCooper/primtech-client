@@ -119,7 +119,9 @@ export class CitizenManager {
 
     spawnRandomCitizen(ageHours: number) {
         const birthdateHours = this.timeManager.currentGameHour - ageHours
+        const money = Utils.normalFalloff(0, this.config.maxStartingMoney)
         const c = new Citizen(this.nextId, birthdateHours)
+        c.money = money
 
         // Aptitude.values().forEach { ap -> c.aptitudes[ap] = ap.randomAptitude(ap) }
         //     Skill.values().forEach { sk -> c.skills[sk] =

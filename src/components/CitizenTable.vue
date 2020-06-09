@@ -13,7 +13,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="citizen in citizenManager.citizens" :key="citizen.id" v-bind:class="{ 'is-selected': selectionM.isSelected(citizen) }">
+        <tr v-for="citizen in selectedCitizensOrAll" :key="citizen.id" v-bind:class="{ 'is-selected': !selectionM.isSelected(citizen) }">
           <td>{{ citizen.id }}</td>
           <td>{{ citizen.currentAgeYears.toFixed(0) }}</td>
           <td>{{ citizen.nutrition.toFixed(0) }}</td>
@@ -44,6 +44,10 @@ import { SelectionManager } from '../selection'
 export default class CitizenTable extends Vue {
   private citizenManager = container.resolve(CitizenManager)
   private selectionM = container.resolve(SelectionManager)  
+
+  get selectedCitizensOrAll() {
+    return this.citizenManager.citizens.filter(c => this.selectionM.isSelected(c))
+  }
 }
 </script>
  

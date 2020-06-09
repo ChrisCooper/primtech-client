@@ -19,5 +19,5 @@ const nutritionGetter: ValueGetter<Citizen> = {title: "🥕 Nutrition", getter: 
 const ageGetter: ValueGetter<Citizen> = {title: "👴 Age", getter: (c: Citizen): number => c.currentAgeYears, xTitle: "years old", yTitle: "# of citizens"}
 const moneyGetter: ValueGetter<Citizen> = {title: "💲 Money", getter: (c: Citizen): number => c.money, xTitle: "dollars", yTitle: "# of citizens"}
 
-export const citizenHistogramConfig = new HistogramConfig<Citizen>(container.resolve(CitizenManager).citizens, [nutritionGetter, ageGetter, moneyGetter])
+export const citizenHistogramConfig = new HistogramConfig<Citizen>(container.resolve(CitizenManager).citizens, [ageGetter, nutritionGetter, moneyGetter])
 
