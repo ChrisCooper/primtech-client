@@ -40,7 +40,7 @@ export class Citizen {
     }
 
     update(currentHour: number) {
-        if (Utils.zeroOneUniformRandom() > 0.5) {
+        if (Utils.zeroOneUniformRandom() > 0.9) {
             this.currentActivity = Skill.RESTING
         } else {
             this.currentActivity = Skill.FORAGING

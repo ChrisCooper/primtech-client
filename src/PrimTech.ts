@@ -1,15 +1,21 @@
 import {CitizenManager} from "@/citizen/citizens";
 import {scoped, Lifecycle} from "tsyringe";
 import {TimeManager} from "@/time"
+import { ForagingManager } from './environment/foraging';
 
 @scoped(Lifecycle.ContainerScoped)
 export class PrimTech {
-  constructor(public citizens: CitizenManager, readonly timeManager: TimeManager) {
+  constructor(
+    readonly citizenM: CitizenManager,
+    readonly timeManager: TimeManager,
+    readonly foragingM: ForagingManager,
+  ) {
     console.log("Init PrimTech")
   }
 
   runOneUpdateCycle() {
-    this.citizens.update()
+    this.citizenM.update()
+    this.foragingM.update()
     this.timeManager.currentGameHour += 1
   }
 }

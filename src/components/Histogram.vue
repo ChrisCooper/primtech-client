@@ -61,6 +61,8 @@ export default class Histogram extends Vue {
   @Prop({default: 500}) dataUpdateDelay!: number
   @Prop({default: 5000}) axesUpdateDelay!: number
   @Prop({default: 15}) numBins!: number
+  @Prop({default: 0}) startIndex!: number
+  
 
   private selectionM = container.resolve(SelectionManager)
   private currentValueGetter!: ValueGetter<TDataElem>
@@ -110,6 +112,8 @@ export default class Histogram extends Vue {
 
       this.yAxisGroup = mainGroup.append("g").attr("class", "yAxis").node()
     
+      this.setValueGetter(this.startIndex)
+
       this.refreshAxesConstantly()
       this.refreshDataConstantly()
     })

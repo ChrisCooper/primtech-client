@@ -2,7 +2,7 @@ import {scoped, Lifecycle} from "tsyringe";
 
 @scoped(Lifecycle.ContainerScoped)
 export class GameConfig {
-    public numStartingFamilies = 40
+    public numStartingFamilies = 4
     public maxStartingChildrenPerFamily = 5
     public maxStartingMoney = 10
 
@@ -23,4 +23,8 @@ export class GameConfig {
 
     public startingNutritionDays = 10
     public startingNutritionHours = this.startingNutritionDays * this.hoursPerDay
+
+    public maxAmountPerForage = 1.5
+    public maxForageStocks = this.hoursPerDay * 30 * 15
+    public forageStockRefreshRatePerHour = (this.maxForageStocks / this.hoursPerDay) / 15
 }

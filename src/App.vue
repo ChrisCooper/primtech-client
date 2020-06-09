@@ -2,9 +2,9 @@
   <div id="app" class="tile is-ancestor">
     <div class="tile is-parent">
       <PageHeader msg="Primitive Technology"/>
-      <Histogram v-bind:histogramConfig="citizenHistogramConfig"/>
-      <Histogram v-bind:histogramConfig="citizenHistogramConfig"/>
-      <Histogram v-bind:histogramConfig="citizenHistogramConfig"/>
+      <Histogram :histogramConfig="citizenHistogramConfig" :startIndex="0"/>
+      <Histogram :histogramConfig="citizenHistogramConfig" :startIndex="1"/>
+      <Histogram :histogramConfig="citizenHistogramConfig" :startIndex="2"/>
       <FrameInfoPane/>
       <CitizenTable/>
     </div>

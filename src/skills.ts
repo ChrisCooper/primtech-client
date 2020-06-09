@@ -1,3 +1,4 @@
+import {container} from "tsyringe";
 import {Citizen} from "@/citizen/citizens"
 import * as behaviors from "@/skills/behaviors"
 
@@ -15,7 +16,7 @@ export class Skill {
         ) {}
 
     static RESTING = new Skill("resting", SkillLevel.of(10), 1.0, null)
-    static FORAGING = new Skill("foraging", SkillLevel.of(10), 1.0, new behaviors.Forage())
+    static FORAGING = new Skill("foraging", SkillLevel.of(10), 1.0, container.resolve(behaviors.Forage))
     static HUNTING = new Skill("hunting", SkillLevel.of(10), 1.0, null)
     static STONE_KNIFE_MAKING = new Skill("stone knife making", SkillLevel.of(10), 1.0, null)
     static TRAPPING = new Skill("trapping", SkillLevel.of(10), 1.0, null)
