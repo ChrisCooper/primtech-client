@@ -2,6 +2,8 @@
   <section>
     <svg className="container" v-bind:width="totalWidth" v-bind:height="totalHeight">
       <g ref="mainGroup" v-bind:transform="marginTransform">
+        <g ref="xAxis" class="xAxis" :transform="`translate(0, ${this.chartHeight})`"></g>
+        <g ref="yAxis" class="yAxis"></g>
         <g ref="barsGroup" class="barsGroup"></g>
         <g ref="selectionBarsGroup" class="selectionBarsGroup"></g>
       </g>
@@ -88,6 +90,8 @@ export default class Histogram extends Vue {
   private yAxisGroup: SVGGElement | null = null
 
   @Ref('mainGroup') readonly mainGroup!: HTMLElement
+  @Ref('xAxis') readonly xAxis!: HTMLElement
+  @Ref('yAxis') readonly yAxis!: HTMLElement
   @Ref('barsGroup') readonly barsGroup!: HTMLElement
   @Ref('selectionBarsGroup') readonly selectionBarsGroup!: HTMLElement
 
@@ -105,12 +109,8 @@ export default class Histogram extends Vue {
       // entire view has been rendered 
       const mainGroup = d3.select(this.mainGroup)
 
-      this.xAxisGroup = mainGroup.append("g")
-      .attr("class", "xA xis")
-      .attr("transform", "translate(0," + this.chartHeight + ")")
-      .node()
-
-      this.yAxisGroup = mainGroup.append("g").attr("class", "yAxis").node()
+      this.xAxisGroup = d3.select(this.xAxis).node() as any
+      this.yAxisGroup = d3.select(this.yAxis).node() as any
     
       this.setValueGetter(this.startIndex)
 
