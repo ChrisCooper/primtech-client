@@ -1,15 +1,15 @@
 <template>
   <section>
-    <svg className="container" v-bind:width="totalWidth" v-bind:height="totalHeight">
-      <g ref="mainGroup" v-bind:transform="marginTransform">
+    <svg className="container" :width="totalWidth" :height="totalHeight">
+      <g ref="mainGroup" :transform="`translate(${this.margins.left}, ${this.margins.top})`">
         <g ref="xAxis" class="xAxis" :transform="`translate(0, ${this.chartHeight})`"></g>
         <g ref="yAxis" class="yAxis"></g>
         <g ref="barsGroup" class="barsGroup"></g>
         <g ref="selectionBarsGroup" class="selectionBarsGroup"></g>
       </g>
-      <text class="chart-title" text-anchor="middle" y="15" x="245">{{ this.currentValueGetter.title}} </text>
-      <text class="axis-label" text-anchor="end" transform="rotate(-90)" y="15" x="-7">{{ this.currentValueGetter.yTitle}} </text>
-      <text class="axis-label" text-anchor="end" x="445" y="250">{{ this.currentValueGetter.xTitle }}</text>
+      <text class="chart-title" text-anchor="middle" y="15" x="245">{{ currentValueGetter.title}} </text>
+      <text class="axis-label" text-anchor="end" transform="rotate(-90)" y="15" x="-7">{{ currentValueGetter.yTitle}} </text>
+      <text class="axis-label" text-anchor="end" x="445" y="250">{{ currentValueGetter.xTitle }}</text>
     </svg>
     <div>
       <span v-for="(vg, i) in histogramConfig.valueGetters" :key="vg.name">
@@ -65,11 +65,10 @@ export default class Histogram extends Vue {
   @Prop({default: 15}) numBins!: number
   @Prop({default: 0}) startIndex!: number
   
+  private selectionM: SelectionManager  
 
-  private selectionM = container.resolve(SelectionManager)
   private currentValueGetter!: ValueGetter<TDataElem>
-
-  private data!: Array<TDataElem>
+  private dataArray!: Array<TDataElem>
  
   chartHeight = 200
   chartWidth = 400
@@ -77,8 +76,6 @@ export default class Histogram extends Vue {
 
   private totalHeight = this.chartHeight + this.margins.top + this.margins.bottom
   private totalWidth = this.chartWidth + this.margins.left + this.margins.right
-
-  private marginTransform = `translate(${this.margins.left}, ${this.margins.top})`
 
   private xScaleInternal = d3.scaleLinear()
   private yScaleInternal = d3.scaleLinear()
@@ -95,9 +92,11 @@ export default class Histogram extends Vue {
   @Ref('barsGroup') readonly barsGroup!: HTMLElement
   @Ref('selectionBarsGroup') readonly selectionBarsGroup!: HTMLElement
 
-  created() {
-    this.data = this.histogramConfig.dataSource
-    this.currentValueGetter = this.histogramConfig.valueGetters[0]
+  constructor() {
+    super()
+     this.selectionM = container.resolve(SelectionManager)
+     this.currentValueGetter = this.histogramConfig.valueGetters[0]
+     this.dataArray = this.histogramConfig.dataSource
   }
 
   mounted(): void { 
@@ -136,13 +135,13 @@ export default class Histogram extends Vue {
     //console.log("Bins")
     const histogram = this.genHistogram()
 
-    const data = useSelection ? this.selectionM.selection : this.data
+    const data = useSelection ? this.selectionM.selection : this.dataArray
 
     return histogram(data)
   }
 
   recalculateXAxis() {
-    const maxVal = d3.max(this.data, this.currentValueGetter.getter) as number
+    const maxVal = d3.max(this.dataArray, this.currentValueGetter.getter) as number
 
     this.xScaleInternal
       .domain([0, maxVal * (1.1)])
@@ -188,10 +187,6 @@ export default class Histogram extends Vue {
   refreshData(useTransition = false) {
     //console.log("refreshData")
 
-    // Select the bar rectangles, or nothing if they haven't been created
-    const barElements = d3.select(this.mainGroup!).selectAll("rect")
-      .data(this.bins())
-
     const barTypes: Array<BarType> = [
       new BarType(this.barsGroup, this.bins(), "#69b3a2", "", false),
       new BarType(this.selectionBarsGroup, this.bins(true), "#1b6eff", "selection", false),
@@ -203,6 +198,7 @@ export default class Histogram extends Vue {
         selectString = `${selectString}.${barType.classString}` 
       }
 
+      // Select the bar rectangles, or nothing if they haven't been created
       const barElements = d3.select(barType.group).selectAll(selectString)
         .data(barType.bins)
 
@@ -253,7 +249,7 @@ export default class Histogram extends Vue {
   }
 
   barTransformation(d: d3.Bin<TDataElem, number>) {
-    return "translate(" + this.xScaleInternal(d.x0!) + "," + this.yScaleInternal(d.length) + ")"
+    return `translate(${this.xScaleInternal(d.x0!)}, ${this.yScaleInternal(d.length)})`
   }
 
   barWidth(d: d3.Bin<TDataElem, number>) {
