@@ -31,9 +31,6 @@ export class ForagingManager {
         this.foragableStocks += change
 
         this.foragableStocks = Math.max(0, Math.min(this.config.maxForageStocks, this.foragableStocks))
-
-        console.log(`${change} = ${refreshLevel} - (${this.stockLevelFraction} * ${refreshLevel})`)
-        console.log(`Foraging stocks: ${this.foragableStocks.toFixed(0)}`)
     }
 
     get stockLevelFraction(): number {

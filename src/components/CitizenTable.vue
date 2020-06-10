@@ -13,7 +13,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="citizen in selectedCitizensOrAll" :key="citizen.id" v-bind:class="{ 'is-selected': !selectionM.isSelected(citizen) }">
+        <tr v-for="citizen in selectedCitizensOrAll" :key="citizen.id" :class="{ 'is-selected': !selectionM.isSelected(citizen) }">
           <td>{{ citizen.id }}</td>
           <td>{{ citizen.currentAgeYears.toFixed(0) }}</td>
           <td>{{ citizen.nutrition.toFixed(0) }}</td>

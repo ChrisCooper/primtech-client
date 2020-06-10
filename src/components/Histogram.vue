@@ -11,29 +11,38 @@
       <text class="axis-label" text-anchor="end" transform="rotate(-90)" y="15" x="-7">{{ currentValueGetter.yTitle}} </text>
       <text class="axis-label" text-anchor="end" x="445" y="250">{{ currentValueGetter.xTitle }}</text>
     </svg>
-    <div>
-      <span v-for="(vg, i) in histogramConfig.valueGetters" :key="vg.name">
-        <button class="data-button" v-on:click="setValueGetter(i)">
-          {{ vg.title }}
-        </button>
-      </span>
-    </div>
+    <DataChooser
+      :valueGetters="histogramConfig.valueGetters"
+      :initialIndex="startIndex"
+      @onValueGetterChange="onValueGetterChange"
+    >
+    </DataChooser>
   </section>
 </template>
 
 <!-- Styles -->
-<style scoped lang="scss">
+<style lang="scss">
 @import "bulma/sass/utilities/_all.sass";
 @import "bulma/sass/elements/button.sass";
+@import "bulma/sass/utilities/derived-variables.sass";
 
 .axis-label {
   fill: #888;
 }
 
-.data-button {
-  margin: 5px;
-  @extend .button, .is-outlined, .is-rounded, .is-small;
+.barsGroup {
+  rect {
+    //fill: $turquoise;
+    fill: $primary;
+  }
 }
+
+.selectionBarsGroup {
+  rect {
+    fill: $info;
+  }
+}
+
 </style>
 
 <script lang="ts"> 
@@ -42,6 +51,7 @@ import { Component, Vue, Ref, Prop } from 'vue-property-decorator'
 import {ValueGetter, HistogramConfig} from "@/charts"
 import {container, scoped, Lifecycle} from "tsyringe" 
 import {SelectionManager} from "@/selection"
+import DataChooser from './DataChooser.vue';
 
 type Range = [number, number]
 type TDataElem = any
@@ -50,13 +60,16 @@ class BarType {
   constructor(
     public group: HTMLElement,
     public bins: d3.Bin<any, number>[],
-    public colorString: string,
     public classString: string,
     public isSelection: boolean,
   ) {}
 }
 
-@Component
+@Component({
+  components: {
+    DataChooser,
+  },
+})
 export default class Histogram extends Vue {
   @Prop() histogramConfig!: HistogramConfig<TDataElem>
 
@@ -95,13 +108,12 @@ export default class Histogram extends Vue {
   constructor() {
     super()
      this.selectionM = container.resolve(SelectionManager)
-     this.currentValueGetter = this.histogramConfig.valueGetters[0]
+     this.currentValueGetter = this.histogramConfig.valueGetters[this.startIndex]
      this.dataArray = this.histogramConfig.dataSource
   }
 
   mounted(): void { 
     //console.log("Histogram mounted")
-    this.setValueGetter(0)
 
     this.$nextTick(() => {
       // Code that will run only after the
@@ -111,16 +123,15 @@ export default class Histogram extends Vue {
       this.xAxisGroup = d3.select(this.xAxis).node() as any
       this.yAxisGroup = d3.select(this.yAxis).node() as any
     
-      this.setValueGetter(this.startIndex)
-
       this.refreshAxesConstantly()
       this.refreshDataConstantly()
     })
   }
 
-  setValueGetter(index: number) {
-    this.currentValueGetter = this.histogramConfig.valueGetters[index]
-    this.refreshAllOnce()
+  onValueGetterChange(valueGetter: ValueGetter<TDataElem>) {
+    this.currentValueGetter = valueGetter
+    this.reBinAndRescaleAxes()
+    //this.refreshAllOnce()
   }
 
   genHistogram() {
@@ -188,8 +199,8 @@ export default class Histogram extends Vue {
     //console.log("refreshData")
 
     const barTypes: Array<BarType> = [
-      new BarType(this.barsGroup, this.bins(), "#69b3a2", "", false),
-      new BarType(this.selectionBarsGroup, this.bins(true), "#1b6eff", "selection", false),
+      new BarType(this.barsGroup, this.bins(), "", false),
+      new BarType(this.selectionBarsGroup, this.bins(true), "selection", false),
     ]
 
     barTypes.forEach(barType => {
@@ -210,7 +221,6 @@ export default class Histogram extends Vue {
               .attr("x", 1)
               .attr("transform", this.barTransformation)
               .attr("width", this.barWidth)
-              .style("fill", barType.colorString)
               .attr("height", this.barHeight)
             
             if (!barType.isSelection) {
@@ -240,7 +250,6 @@ export default class Histogram extends Vue {
               .attr("transform", this.barTransformation)
               .attr("width", this.barWidth)
               .attr("height", this.barHeight)
-              .style("fill", barType.colorString)
 
             return update
           },
