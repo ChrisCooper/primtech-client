@@ -20,7 +20,7 @@
     "grpc_tools_node_protoc_ts": "^3.0.0",
     "reflect-metadata": "^0.1.13",
     "tsyringe": "^4.3.0",
-    "vue": "^2.6.11",
+    "vue": "^3.0.0",
     "vue-class-component": "^7.2.3",
     "vue-property-decorator": "^8.4.1",
     "vuex": "^3.1.3"
